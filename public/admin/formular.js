@@ -2,6 +2,7 @@
 // ctx: { leistungen, fotoUrl(datei), fotoHochladen(file) -> Promise<datei>, fotoAuswaehlen() -> Promise<datei|null>,
 //        geaendert(), neuZeichnen() }
 import { h, melde } from './dom.js';
+import { symbol } from './symbole.js';
 
 const hole = (obj, name) => name.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
 function setze(obj, name, wert) {
@@ -119,12 +120,12 @@ function mehrfachFeld(def, daten, ctx) {
 function eintragKnoepfe(liste, i, ctx, name) {
   const schiebe = (von, nach) => { const [x] = liste.splice(von, 1); liste.splice(nach, 0, x); ctx.geaendert(name); ctx.neuZeichnen(); };
   return h('span', { class: 'eintrag-knoepfe' },
-    h('button', { type: 'button', class: 'mini', title: 'Nach oben', 'aria-label': 'Nach oben', disabled: i === 0, onclick: () => schiebe(i, i - 1) }, '↑'),
-    h('button', { type: 'button', class: 'mini', title: 'Nach unten', 'aria-label': 'Nach unten', disabled: i === liste.length - 1, onclick: () => schiebe(i, i + 1) }, '↓'),
+    h('button', { type: 'button', class: 'mini', title: 'Eine Stelle nach oben schieben', disabled: i === 0, onclick: () => schiebe(i, i - 1) }, symbol('hoch'), 'Hoch'),
+    h('button', { type: 'button', class: 'mini', title: 'Eine Stelle nach unten schieben', disabled: i === liste.length - 1, onclick: () => schiebe(i, i + 1) }, symbol('runter'), 'Runter'),
     h('button', {
-      type: 'button', class: 'mini loeschen', title: 'Entfernen', 'aria-label': 'Entfernen',
+      type: 'button', class: 'mini loeschen', title: 'Diesen Eintrag entfernen',
       onclick: () => { if (confirm('Diesen Eintrag entfernen?')) { liste.splice(i, 1); ctx.geaendert(name); ctx.neuZeichnen(); } },
-    }, '✕'),
+    }, symbol('entfernen'), 'Entfernen'),
   );
 }
 
@@ -132,17 +133,21 @@ function textlisteFeld(def, daten, ctx) {
   const id = neueId();
   if (!Array.isArray(hole(daten, def.name))) setze(daten, def.name, []);
   const liste = hole(daten, def.name);
-  const zeilen = liste.map((wert, i) => h('div', { class: 'textliste-zeile' },
-    h(def.mehrzeilig ? 'textarea' : 'input', {
+  // Absätze: eigener Rahmen mit Nummer, damit klar ist, zu welchem Absatz die Knöpfe gehören.
+  // Kurze Punkte: eine Zeile mit Knöpfen daneben.
+  const zeilen = liste.map((wert, i) => {
+    const eingabe = h(def.mehrzeilig ? 'textarea' : 'input', {
       ...(def.mehrzeilig ? { rows: 4 } : { type: 'text' }), value: wert, 'aria-label': `${def.eintrag} ${i + 1}`,
       id: i === 0 ? id : undefined,
       oninput: (e) => { liste[i] = e.target.value; ctx.geaendert(def.name); },
-    }),
-    eintragKnoepfe(liste, i, ctx, def.name),
-  ));
+    });
+    return def.mehrzeilig
+      ? h('div', { class: 'eintrag' }, h('div', { class: 'eintrag-kopf' }, h('span', { text: `${def.eintrag} ${i + 1}` }), eintragKnoepfe(liste, i, ctx, def.name)), eingabe)
+      : h('div', { class: 'textliste-zeile' }, eingabe, eintragKnoepfe(liste, i, ctx, def.name));
+  });
   return feldRahmen(def, id, [
     ...zeilen,
-    h('button', { type: 'button', class: 'knopf klein', onclick: () => { liste.push(''); ctx.geaendert(def.name); ctx.neuZeichnen(); } }, `+ ${def.eintrag} hinzufügen`),
+    h('button', { type: 'button', class: 'knopf klein', onclick: () => { liste.push(''); ctx.geaendert(def.name); ctx.neuZeichnen(); } }, symbol('plus'), `${def.eintrag} hinzufügen`),
   ], { alsGruppe: true });
 }
 
@@ -156,7 +161,7 @@ function objektlisteFeld(def, daten, ctx) {
     ctx.geaendert(def.name);
     ctx.neuZeichnen();
   };
-  const hinzu = h('button', { type: 'button', class: 'knopf klein', onclick: neuerEintrag }, `+ ${def.eintrag} hinzufügen`);
+  const hinzu = h('button', { type: 'button', class: 'knopf klein', onclick: neuerEintrag }, symbol('plus'), `${def.eintrag} hinzufügen`);
   const eintraege = liste.map((obj, i) => {
     const kopfText = h('span', { text: obj[def.titelVon] || `${def.eintrag} ${i + 1}` });
     const kind = { ...ctx, geaendert: (n) => { kopfText.textContent = obj[def.titelVon] || `${def.eintrag} ${i + 1}`; ctx.geaendert(`${def.name}.${n}`); } };
@@ -191,8 +196,8 @@ function fotoKnoepfe(ctx, { mehrere, beiDateien, beiAuswahl }) {
   });
   return h('span', { class: 'foto-knoepfe' },
     input,
-    h('button', { type: 'button', class: 'knopf klein', onclick: () => input.click() }, mehrere ? '📷 Fotos hochladen' : '📷 Foto hochladen'),
-    h('button', { type: 'button', class: 'knopf klein', onclick: async () => { const d = await ctx.fotoAuswaehlen(); if (d) beiAuswahl(d); } }, 'Vorhandenes wählen'),
+    h('button', { type: 'button', class: 'knopf klein', onclick: () => input.click() }, symbol('hochladen'), mehrere ? 'Fotos hochladen' : 'Foto hochladen'),
+    h('button', { type: 'button', class: 'knopf klein', onclick: async () => { const d = await ctx.fotoAuswaehlen(); if (d) beiAuswahl(d); } }, symbol('galerie'), 'Vorhandenes Foto wählen'),
   );
 }
 
@@ -259,16 +264,29 @@ function fotosFestFeld(def, daten, ctx) {
   )), { alsGruppe: true });
 }
 
-function gruppe(def, daten, ctx) {
-  return h('details', { class: 'gruppe', open: def.offen || undefined },
-    h('summary', { text: def.label }),
-    def.felder.map((f) => feld(f, daten, ctx)),
-  );
+// Abschnitt = eigene Karte mit Symbol, Überschrift und kurzer Erklärung. Seltenes ist zugeklappt;
+// ob ein zugeklappter Abschnitt offen ist, bleibt beim Neuzeichnen erhalten.
+const offeneAbschnitte = new Set();
+function abschnitt(def, daten, ctx) {
+  const id = neueId();
+  const kopf = [
+    h('span', { class: 'abschnitt-symbol' }, symbol(def.symbol)),
+    h('span', { class: 'abschnitt-kopftext' },
+      h('h2', { id: `${id}-t`, text: def.titel }),
+      def.text && h('span', { class: 'abschnitt-text', text: def.text })),
+  ];
+  // Nur ein Feld im Abschnitt: dessen Beschriftung wiederholt nur die Überschrift – sichtbar weglassen
+  const inhalt = h('div', { class: `abschnitt-inhalt${def.felder.length === 1 ? ' einzeln' : ''}` }, def.felder.map((f) => feld(f, daten, ctx)));
+  if (!def.zugeklappt) return h('section', { class: 'karte abschnitt', 'aria-labelledby': `${id}-t` }, h('div', { class: 'abschnitt-kopf' }, kopf), inhalt);
+  return h('details', {
+    class: 'karte abschnitt zugeklappt', open: offeneAbschnitte.has(def.titel) || undefined,
+    ontoggle: (e) => (e.target.open ? offeneAbschnitte.add(def.titel) : offeneAbschnitte.delete(def.titel)),
+  }, h('summary', { class: 'abschnitt-kopf' }, kopf, h('span', { class: 'aufklappen', 'aria-hidden': 'true' })), inhalt);
 }
 
 const baumeister = {
   text: textFeld, textarea: textFeld, zahl: zahlFeld, telefon: telefonFeld, schalter: schalterFeld, auswahl: auswahlFeld, mehrfach: mehrfachFeld,
-  textliste: textlisteFeld, objektliste: objektlisteFeld, foto: fotoFeld, fotoliste: fotolisteFeld, 'fotos-fest': fotosFestFeld, gruppe,
+  textliste: textlisteFeld, objektliste: objektlisteFeld, foto: fotoFeld, fotoliste: fotolisteFeld, 'fotos-fest': fotosFestFeld, abschnitt,
 };
 
 export function feld(def, daten, ctx) {
@@ -281,7 +299,12 @@ export function feld(def, daten, ctx) {
 export function fehlendePflichtfelder(felder, daten, praefix = '') {
   const fehler = [];
   for (const def of felder) {
-    if (def.typ === 'gruppe') { fehler.push(...fehlendePflichtfelder(def.felder, daten, praefix)); continue; }
+    if (def.typ === 'abschnitt') {
+      // Ein Feld allein im Abschnitt: in der Meldung heißt es wie der Abschnitt („Beschreibung fehlt“)
+      const felderHier = def.felder.length === 1 ? [{ ...def.felder[0], label: def.titel }] : def.felder;
+      fehler.push(...fehlendePflichtfelder(felderHier, daten, praefix));
+      continue;
+    }
     const wert = hole(daten, def.name);
     if (def.typ === 'objektliste') {
       (wert ?? []).forEach((obj, i) => fehler.push(...fehlendePflichtfelder(def.felder, obj, `${def.eintrag} ${i + 1}: `)));

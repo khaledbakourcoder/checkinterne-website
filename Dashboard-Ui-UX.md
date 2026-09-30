@@ -70,13 +70,13 @@ Ein Dashboard für Nicht-Techniker ist dann gut, wenn der Nutzer **nichts lernen
 | Grundsatz | Stand heute | Bewertung |
 |---|---|---|
 | Wenige Optionen, nur Bestehendes bearbeiten | 3 Aufgaben auf der Übersicht, kein Anlegen/Löschen, Bewertungen ausgeblendet | ✅ erfüllt |
-| Schrittweise Offenlegung, max. 2 Ebenen | Technisches unter „Erweitert“, Tipps für Google zugeklappt | ✅ erfüllt |
+| Schrittweise Offenlegung, max. 2 Ebenen | Jede Seite in Abschnitte (Karte mit Symbol, Überschrift, Erklärung) geteilt; Technisches zugeklappt unter „Weitere Einstellungen“ | ✅ erfüllt |
 | Feste Navigation | Seitenleiste links, aktiver Bereich markiert | ✅ erfüllt |
 | Eingaben in jedem Format | Telefonnummern normal eingeben, Umrechnung automatisch | ✅ erfüllt |
 | Automatisch ergänzen statt fragen | Bildbeschreibungen, Kurzname, Google-Texte werden erzeugt | ✅ erfüllt |
 | Ein Speicher-Muster | Nur „Speichern“-Knopf, speichert und veröffentlicht direkt | ✅ erfüllt |
 | Fehler erst nach dem Absenden | Pflichtfelder werden erst beim Speichern geprüft | ✅ erfüllt |
-| Symbole mit Text | Listen-Knöpfe sind nur **↑ ↓ ✕** ohne Text | ❌ **fehlt** |
+| Symbole mit Text | Alle Symbole (Navigation, Abschnitte, Knöpfe) stehen neben einem Text: „Hoch“, „Runter“, „Entfernen“ | ✅ erfüllt |
 | Fehler am Feld zeigen | Fehler erscheinen nur als Sammelmeldung unten rechts, Feld wird nicht markiert | ❌ **fehlt** |
 | Rückgängig sichtbar | Nur im Bereich „Verlauf“; nach dem Speichern kein „Rückgängig“-Knopf | ⚠️ teilweise |
 | Klare Rückmeldung | „Gespeichert“ verschwindet nach 5 Sek.; kein dauerhafter Hinweis „ungespeichert/gespeichert“ | ⚠️ teilweise |
@@ -84,7 +84,7 @@ Ein Dashboard für Nicht-Techniker ist dann gut, wenn der Nutzer **nichts lernen
 | Lesbarkeit | Fließtext 16 px, Knöpfe 34–42 px hoch | ⚠️ etwas zu klein |
 | Wiedererkennen | Baustellen-Liste ohne Vorschaubild | ⚠️ teilweise |
 | Vorschau der Seite | Nur Google-Vorschau, keine Vorschau der echten Seite | ⚠️ teilweise |
-| Fachbegriffe | Überwiegend Alltagssprache; noch „Erweitert“, „Kurzname für die Filter-Knöpfe“, „Position in der Liste“ | ⚠️ kleine Reste |
+| Fachbegriffe | Überwiegend Alltagssprache; Begriffe geglättet („Weitere Einstellungen“, „Reihenfolge in der Liste“) | ✅ erfüllt |
 | Einführung & Hilfe | Keine Einführung beim ersten Besuch, kein Hilfe-Kontakt | ❌ **fehlt** |
 | Test mit dem Kunden | Noch nicht gemacht | ❌ **fehlt** |
 
