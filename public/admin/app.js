@@ -395,6 +395,21 @@ window.addEventListener('beforeunload', (e) => { if (z.ungespeichert) { e.preven
 // Symbole in der Seitenleiste (immer mit Text daneben)
 document.querySelectorAll('#navigation a[data-symbol]').forEach((a) => a.prepend(symbol(a.dataset.symbol)));
 
+// Handy/Tablet: Bereiche hinter dem Knopf „Menü“ – schließt nach Auswahl, bei Esc und bei Klick daneben
+const leiste = document.querySelector('.seitenleiste');
+const menueKnopf = document.getElementById('menue-knopf');
+function menue(offen) {
+  leiste.classList.toggle('offen', offen);
+  menueKnopf.setAttribute('aria-expanded', String(offen));
+  leeren(menueKnopf).append(symbol(offen ? 'schliessen' : 'menue'), offen ? 'Schließen' : 'Menü');
+}
+menue(false);
+// stopPropagation: der Knopf tauscht beim Umschalten seinen Inhalt aus – sonst hielte „Klick daneben“ ihn für außerhalb
+menueKnopf.addEventListener('click', (e) => { e.stopPropagation(); menue(!leiste.classList.contains('offen')); });
+document.getElementById('navigation').addEventListener('click', (e) => { if (e.target.closest('a')) menue(false); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && leiste.classList.contains('offen')) { menue(false); menueKnopf.focus(); } });
+document.addEventListener('click', (e) => { if (leiste.classList.contains('offen') && !leiste.contains(e.target)) menue(false); });
+
 laden().then(zeige).catch((e) => {
   leeren(app).append(h('h1', { text: 'Das Dashboard konnte nicht geladen werden.' }), h('p', { text: e.message }));
 });

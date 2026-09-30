@@ -36,6 +36,7 @@ const formen = {
   extern: ['M14 4h6v6', 'M20 4l-9 9', 'M18 14v6H4V6h6'],
   schliessen: ['M6 6l12 12', 'M18 6 6 18'],
   zurueck: ['M15 18l-6-6 6-6'],
+  menue: ['M4 6h16', 'M4 12h16', 'M4 18h16'],
   rueckgaengig: ['M9 14 4 9l5-5', 'M4 9h10.5a5.5 5.5 0 0 1 0 11H11'],
 };
 
