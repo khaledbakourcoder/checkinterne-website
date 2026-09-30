@@ -1,6 +1,5 @@
-// Prüft das Token von Cloudflare Access (Login per E-Mail-Code).
-// Cloudflare Access sperrt /admin und /api schon am Rand des Netzes. Diese Prüfung ist die zweite Sicherung:
-// Ohne gültiges, signiertes Token – oder wenn die Konfiguration fehlt – wird der Zugriff verweigert.
+// Zugang zum Dashboard: Benutzername + Passwort (eigene Anmeldeseite) oder wahlweise Cloudflare Access.
+// Ohne gültige Anmeldung – oder wenn die Konfiguration fehlt – wird der Zugriff verweigert (fail closed).
 import { CmsFehler } from './hilfen.js';
 
 const schluesselCache = new Map(); // team -> { zeit, schluessel: Map<kid, CryptoKey> }
@@ -43,27 +42,85 @@ async function gleich(a, b) {
   return diff === 0;
 }
 
-// Testmodus ohne Cloudflare Access: Anmeldefenster des Browsers (HTTP Basic Auth) mit einem Passwort.
-// Nur gedacht, bis Access eingerichtet ist – sobald ACCESS_* gesetzt sind, gilt ausschließlich Access.
-async function pruefePasswort(request, passwort) {
-  const fehlt = () => Object.assign(new CmsFehler(401, 'Bitte anmelden.'), { basic: true });
-  const kopf = request.headers.get('Authorization') ?? '';
-  if (!kopf.startsWith('Basic ')) throw fehlt();
-  let klartext;
-  try { klartext = new TextDecoder().decode(base64url(kopf.slice(6).trim())); } catch { throw fehlt(); }
-  const eingabe = klartext.slice(klartext.indexOf(':') + 1);
-  if (!(await gleich(eingabe, passwort))) throw fehlt();
-  return { email: 'test@passwort' };
+// ---------- Anmeldung mit Benutzername und Passwort (eigene Anmeldeseite) ----------
+// Benutzername und Passwort stehen als Secrets beim Hoster (ADMIN_BENUTZER, ADMIN_PASSWORT), nie im Code.
+// Nach der Anmeldung trägt ein signiertes Cookie „wer, bis wann“. Der Schlüssel wird aus Benutzer und
+// Passwort abgeleitet – wer das Passwort ändert, meldet damit automatisch alle Geräte ab.
+const COOKIE = 'cms_sitzung';
+const SITZUNG_SEKUNDEN = 7 * 24 * 3600;
+export const MIN_PASSWORT = 12;
+const MAX_FEHLVERSUCHE = 5;
+const SPERRE_MS = 15 * 60 * 1000;
+const kodiere = new TextEncoder();
+
+const zuBase64url = (bytes) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const passwortModus = (env) => Boolean((env.ADMIN_BENUTZER ?? '').trim() && (env.ADMIN_PASSWORT ?? '').length >= MIN_PASSWORT);
+const bitteAnmelden = () => Object.assign(new CmsFehler(401, 'Bitte anmelden.'), { anmeldung: true });
+
+async function signiere(env, text) {
+  const roh = await crypto.subtle.digest('SHA-256', kodiere.encode(`cms-sitzung\n${env.ADMIN_BENUTZER}\n${env.ADMIN_PASSWORT}`));
+  const key = await crypto.subtle.importKey('raw', roh, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return zuBase64url(new Uint8Array(await crypto.subtle.sign('HMAC', key, kodiere.encode(text))));
 }
 
-// env: ACCESS_TEAM_DOMAIN (z. B. checkinterne.cloudflareaccess.com), ACCESS_AUD, ERLAUBTE_EMAILS (Komma-Liste)
-// oder für Tests nur TEST_PASSWORT (mindestens 12 Zeichen)
+async function pruefeSitzung(request, env) {
+  const wert = (request.headers.get('Cookie') ?? '').match(new RegExp(`(?:^|;\\s*)${COOKIE}=([^;]+)`))?.[1];
+  const teile = wert?.split('.') ?? [];
+  if (teile.length !== 3 || !/^\d+$/.test(teile[1])) throw bitteAnmelden();
+  const [benutzerTeil, ablauf, sig] = teile;
+  if (Number(ablauf) < Math.floor(Date.now() / 1000)) throw bitteAnmelden();
+  if (!(await gleich(sig, await signiere(env, `${benutzerTeil}.${ablauf}`)))) throw bitteAnmelden();
+  let benutzer;
+  try { benutzer = new TextDecoder().decode(base64url(benutzerTeil)); } catch { throw bitteAnmelden(); }
+  if (benutzer !== env.ADMIN_BENUTZER.trim()) throw bitteAnmelden();
+  return { email: `${benutzer}@dashboard` };
+}
+
+// Fehlversuche je IP (pro Server-Instanz – bremst Durchprobieren, zusammen mit Pause und langem Passwort)
+const fehlversuche = new Map();
+const warte = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Gibt bei Erfolg den Set-Cookie-Wert zurück
+export async function anmelden(request, env, { benutzer, passwort } = {}) {
+  if (env.ACCESS_TEAM_DOMAIN || env.ACCESS_AUD) throw new CmsFehler(400, 'Die Anmeldung läuft über Cloudflare Access.');
+  if (!passwortModus(env)) throw new CmsFehler(503, 'Dashboard ist noch nicht eingerichtet (Zugangsdaten fehlen).');
+  const ip = request.headers.get('CF-Connecting-IP') ?? 'unbekannt';
+  const jetzt = Date.now();
+  const eintrag = fehlversuche.get(ip);
+  if (eintrag && eintrag.bis > jetzt && eintrag.anzahl >= MAX_FEHLVERSUCHE) {
+    throw new CmsFehler(429, 'Zu viele falsche Versuche. Bitte in 15 Minuten noch einmal probieren.');
+  }
+  // Beide Vergleiche immer ausführen, damit die Antwortzeit nichts verrät
+  const nameOk = await gleich(String(benutzer ?? '').trim(), env.ADMIN_BENUTZER.trim());
+  const passwortOk = await gleich(String(passwort ?? ''), env.ADMIN_PASSWORT);
+  if (!nameOk || !passwortOk) {
+    const neu = eintrag && eintrag.bis > jetzt ? eintrag : { anzahl: 0, bis: jetzt + SPERRE_MS };
+    neu.anzahl += 1;
+    fehlversuche.set(ip, neu);
+    await warte(700);
+    throw new CmsFehler(401, 'Benutzername oder Passwort ist falsch.');
+  }
+  fehlversuche.delete(ip);
+  const benutzerTeil = zuBase64url(kodiere.encode(env.ADMIN_BENUTZER.trim()));
+  const ablauf = Math.floor(jetzt / 1000) + SITZUNG_SEKUNDEN;
+  const sig = await signiere(env, `${benutzerTeil}.${ablauf}`);
+  return `${COOKIE}=${benutzerTeil}.${ablauf}.${sig}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${SITZUNG_SEKUNDEN}`;
+}
+
+export const abmeldeCookie = () => `${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`;
+
+// Welche Anmeldung gilt:
+//   Cloudflare Access, wenn ACCESS_TEAM_DOMAIN/ACCESS_AUD gesetzt sind (dazu ERLAUBTE_EMAILS),
+//   sonst Benutzername + Passwort (ADMIN_BENUTZER, ADMIN_PASSWORT mit mind. 12 Zeichen).
+//   Fehlt beides, bleibt alles gesperrt.
 export async function pruefeZugang(request, env) {
   const team = env.ACCESS_TEAM_DOMAIN;
   const aud = env.ACCESS_AUD;
+  if (!team && !aud) {
+    if (passwortModus(env)) return pruefeSitzung(request, env);
+    throw new CmsFehler(503, 'Dashboard ist noch nicht eingerichtet (Zugangsdaten fehlen).');
+  }
   const erlaubt = (env.ERLAUBTE_EMAILS ?? '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
-  const testPasswort = env.TEST_PASSWORT ?? '';
-  if (!team && !aud && testPasswort.length >= 12) return pruefePasswort(request, testPasswort);
   if (!team || !aud || !erlaubt.length) throw new CmsFehler(503, 'Dashboard ist noch nicht eingerichtet (Zugangsdaten fehlen).');
 
   const token = tokenAus(request);

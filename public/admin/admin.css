@@ -35,7 +35,29 @@ h2 { font-size: 1.0625rem; margin: 0 0 10px; color: var(--blau-tief); }
 .seitenleiste ul a .symbol { width: 20px; height: 20px; }
 .seitenleiste ul a:hover { background: rgba(255,255,255,.08); color: #fff; }
 .seitenleiste ul a[aria-current="page"] { background: #fff; color: var(--blau-tief); }
-.nutzer { margin: auto 0 0; padding: 0 10px; font-size: .8125rem; opacity: .7; overflow-wrap: anywhere; }
+.nutzer-box { margin-top: auto; padding: 0 10px; }
+.nutzer { margin: 0 0 6px; font-size: .8125rem; opacity: .7; overflow-wrap: anywhere; }
+.abmelden {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px;
+  border: 1px solid rgba(255,255,255,.35); border-radius: 8px; background: transparent; color: #fff; font-weight: 600; cursor: pointer;
+}
+.abmelden:hover { background: rgba(255,255,255,.1); }
+.abmelden .symbol { width: 18px; height: 18px; }
+
+/* ---------- Anmeldeseite ---------- */
+.anmelde-seite { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: var(--blau-tief); }
+.anmelde-karte { width: min(100%, 420px); padding: 32px 28px; background: #fff; border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,.3); }
+.anmelde-marke { margin: 0 0 20px; font-weight: 800; font-size: 1.1875rem; color: var(--blau-tief); line-height: 1.2; }
+.anmelde-marke small { display: block; font-weight: 400; font-size: .875rem; color: var(--leise); }
+.anmelde-karte h1 { margin-bottom: 18px; }
+.anmelde-karte label { display: block; font-weight: 700; margin: 14px 0 4px; }
+.anmelde-karte input { min-height: 48px; font-size: 1.0625rem; }
+.passwort-zeile { display: flex; gap: 8px; }
+.passwort-zeile input { flex: 1; min-width: 0; }
+.passwort-zeile .knopf { min-height: 48px; }
+.anmelde-fehler { margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--rot-hell); color: var(--rot); font-weight: 600; }
+.anmelde-knopf { width: 100%; min-height: 50px; margin-top: 20px; font-size: 1.0625rem; }
+.anmelde-hinweis { margin: 16px 0 0; color: var(--leise); font-size: .875rem; }
 
 .hauptbereich { margin-left: var(--leiste); min-height: 100vh; }
 .status {
@@ -229,7 +251,9 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
   }
   .seitenleiste li.trenner { margin: 0; padding: 0; border: 0; }
   .seitenleiste ul a { min-height: 48px; background: rgba(255,255,255,.07); font-size: 1.0625rem; }
-  .nutzer { display: none; }
+  .nutzer-box { display: none; }
+  .seitenleiste.offen .nutzer-box { display: block; flex: 1 0 100%; padding: 6px 0 4px; }
+  .seitenleiste.offen .nutzer { display: none; }
   .hauptbereich { margin-left: 0; }
   main { padding: 20px 16px 110px; }
   .status { padding: 10px 16px; }

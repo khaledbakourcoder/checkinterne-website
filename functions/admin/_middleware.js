@@ -1,19 +1,22 @@
-// Zweite Sicherung für die Dashboard-Dateien unter /admin/: ohne gültige Cloudflare-Access-Anmeldung
-// wird nichts ausgeliefert – auch dann nicht, wenn die Access-Regel versehentlich fehlt.
+// Zweite Sicherung für die Dashboard-Dateien unter /admin/: ohne gültige Anmeldung wird nichts ausgeliefert.
+// Nur die Anmeldeseite selbst (mit Stil und Skript) ist ohne Anmeldung erreichbar.
 import { pruefeZugang } from '../../cms/zugang.js';
 
+// Cloudflare Pages liefert „anmelden.html“ unter „/admin/anmelden“ aus – beide Schreibweisen zulassen
+const OFFEN = new Set(['/admin/anmelden', '/admin/anmelden.js', '/admin/admin.css']);
+
 export async function onRequest({ request, env, next }) {
-  try {
-    await pruefeZugang(request, env);
-  } catch (e) {
-    return new Response(`Kein Zugang: ${e.message}`, {
-      status: e.status ?? 401,
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex',
-        // Testmodus: Browser zeigt sein Anmeldefenster
-        ...(e.basic ? { 'WWW-Authenticate': 'Basic realm="Checkinterne Dashboard", charset="UTF-8"' } : {}),
-      },
-    });
+  const pfad = new URL(request.url).pathname.replace(/\.html$/, '');
+  if (!OFFEN.has(pfad)) {
+    try {
+      await pruefeZugang(request, env);
+    } catch (e) {
+      if (e.anmeldung) return Response.redirect(new URL('/admin/anmelden', request.url).toString(), 302);
+      return new Response(`Kein Zugang: ${e.message}`, {
+        status: e.status ?? 401,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' },
+      });
+    }
   }
   const antwort = await next();
   const kopie = new Response(antwort.body, antwort);

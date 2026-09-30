@@ -37,6 +37,7 @@ const formen = {
   schliessen: ['M6 6l12 12', 'M18 6 6 18'],
   zurueck: ['M15 18l-6-6 6-6'],
   menue: ['M4 6h16', 'M4 12h16', 'M4 18h16'],
+  abmelden: ['M9 20H5V4h4', 'M16 16l4-4-4-4', 'M20 12H9'],
   rueckgaengig: ['M9 14 4 9l5-5', 'M4 9h10.5a5.5 5.5 0 0 1 0 11H11'],
 };
 

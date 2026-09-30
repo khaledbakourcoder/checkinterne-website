@@ -24,6 +24,11 @@ async function body(req) {
 createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   try {
+    // Lokal gibt es keine Anmeldung – Anmelden/Abmelden einfach bestätigen
+    if (req.method === 'POST' && (url.pathname === '/api/anmelden' || url.pathname === '/api/abmelden')) {
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      return res.end('{"ok":true}');
+    }
     if (url.pathname.startsWith('/api/')) {
       const ergebnis = await bearbeite(
         { methode: req.method, pfad: url.pathname, body: req.method === 'GET' ? undefined : await body(req) },
@@ -38,7 +43,8 @@ createServer(async (req, res) => {
     }
     if (url.pathname === '/' || url.pathname === '/admin') { res.writeHead(302, { Location: '/admin/' }); return res.end(); }
     if (url.pathname.startsWith('/admin/')) {
-      const rel = normalize(url.pathname.slice('/admin/'.length) || 'index.html');
+      let rel = normalize(url.pathname.slice('/admin/'.length) || 'index.html');
+      if (!extname(rel)) rel += '.html'; // wie Cloudflare Pages: /admin/anmelden → anmelden.html
       if (rel.startsWith('..')) { res.writeHead(400); return res.end(); }
       const datei = join(ADMIN, rel);
       const inhalt = await readFile(datei);

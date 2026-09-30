@@ -29,7 +29,11 @@ async function api(pfad, { methode = 'GET', body } = {}) {
     credentials: 'same-origin',
   });
   const daten = await antwort.json().catch(() => ({}));
-  if (antwort.status === 401) throw new Error('Sie sind nicht mehr angemeldet. Bitte die Seite neu laden.');
+  if (antwort.status === 401) {
+    // Anmeldung abgelaufen: zur Anmeldeseite (bei ungespeicherten Änderungen fragt der Browser vorher nach)
+    location.href = '/admin/anmelden';
+    throw new Error('Sie sind nicht mehr angemeldet.');
+  }
   if (!antwort.ok) throw new Error(daten.fehler || `Fehler ${antwort.status}`);
   return daten;
 }
@@ -39,7 +43,8 @@ async function laden() {
   z.meta = { modus: d.modus, unveroeffentlicht: d.unveroeffentlicht, vorschauUrl: d.vorschauUrl, nutzer: d.nutzer };
   z.inhalt = d.inhalt;
   z.bilder = new Set(d.bilder);
-  document.getElementById('nutzer').textContent = d.nutzer;
+  document.getElementById('nutzer').textContent = d.nutzer.replace(/@dashboard$/, '');
+  document.getElementById('abmelden').hidden = d.modus === 'lokal';
   document.getElementById('nav-verlauf').hidden = d.modus === 'lokal';
   zeigeStatus();
 }
@@ -391,6 +396,14 @@ window.addEventListener('hashchange', () => {
   zeige();
 });
 window.addEventListener('beforeunload', (e) => { if (z.ungespeichert) { e.preventDefault(); e.returnValue = ''; } });
+
+document.getElementById('abmelden').addEventListener('click', async () => {
+  if (z.ungespeichert && !confirm('Sie haben noch nicht gespeichert. Trotzdem abmelden?')) return;
+  z.ungespeichert = false;
+  await fetch('/api/abmelden', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CMS': '1' }, body: '{}', credentials: 'same-origin' }).catch(() => {});
+  location.replace('/admin/anmelden');
+});
+document.getElementById('abmelden').prepend(symbol('abmelden'));
 
 // Symbole in der Seitenleiste (immer mit Text daneben)
 document.querySelectorAll('#navigation a[data-symbol]').forEach((a) => a.prepend(symbol(a.dataset.symbol)));
