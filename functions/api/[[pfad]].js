@@ -1,7 +1,7 @@
 // Cloudflare Pages Function: alle Anfragen an /api/* des Dashboards.
 // Nötige Umgebungsvariablen (im Cloudflare-Dashboard als „Secrets“ anlegen):
-//   GITHUB_TOKEN        Fine-grained Token, NUR für dieses Repository, Rechte: Contents (Lesen+Schreiben)
-//   GITHUB_REPO         z. B. khaledbakourcoder/checkinterne-website
+//   CMS_GITHUB_TOKEN    Fine-grained Token, NUR für dieses Repository, Rechte: Contents (Lesen+Schreiben)
+//   CMS_GITHUB_REPO     z. B. khaledbakourcoder/checkinterne-website
 //   ACCESS_TEAM_DOMAIN  z. B. checkinterne.cloudflareaccess.com
 //   ACCESS_AUD          „Application Audience (AUD) Tag“ der Access-Anwendung
 //   ERLAUBTE_EMAILS     Komma-Liste der E-Mail-Adressen mit Zugang
@@ -37,7 +37,7 @@ export async function onRequest({ request, env }) {
       if (Number(request.headers.get('Content-Length') ?? 0) > MAX_BODY) throw new CmsFehler(413, 'Zu viele oder zu große Fotos auf einmal.');
       body = await request.json().catch(() => { throw new CmsFehler(400, 'Ungültige Daten.'); });
     }
-    const speicher = githubSpeicher({ token: env.GITHUB_TOKEN, repo: env.GITHUB_REPO });
+    const speicher = githubSpeicher({ token: env.CMS_GITHUB_TOKEN, repo: env.CMS_GITHUB_REPO });
     const ergebnis = await bearbeite(
       { methode, pfad: new URL(request.url).pathname, body },
       { speicher, nutzer, vorschauUrl: env.CMS_VORSCHAU_URL ?? '' },

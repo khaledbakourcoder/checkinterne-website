@@ -4,7 +4,7 @@ import { CmsFehler, base64ZuBytes, bytesZuBase64, bytesZuText } from './hilfen.j
 import { INHALT_PFAD, BILD_ORDNER, BILDNAME } from './pruefung.js';
 
 export function githubSpeicher({ token, repo, entwurf = 'entwurf', live = 'main' }) {
-  if (!token || !/^[\w.-]+\/[\w.-]+$/.test(repo ?? '')) throw new Error('GITHUB_TOKEN oder GITHUB_REPO fehlt');
+  if (!token || !/^[\w.-]+\/[\w.-]+$/.test(repo ?? '')) throw new CmsFehler(503, 'Dashboard ist noch nicht eingerichtet (CMS_GITHUB_TOKEN oder CMS_GITHUB_REPO fehlt).');
 
   // Cloudflare (Gratis-Plan) erlaubt nur 50 Unteranfragen pro Aufruf – deshalb wird sparsam angefragt.
   async function api(pfad, { methode = 'GET', body, roh = false, erlaubt = [] } = {}) {

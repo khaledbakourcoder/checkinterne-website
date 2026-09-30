@@ -40,7 +40,7 @@ npm run cms      # Dashboard: http://127.0.0.1:4322/admin/ (schreibt direkt in i
 3. **Cloudflare Access** (Zero Trust, kostenlos bis 50 Nutzer): Anwendung für `…/admin` und `…/api` anlegen,
    Login per „One-time PIN“ (E-Mail-Code), nur die E-Mail des Kunden (und die eigene) erlauben.
 4. **Variablen/Secrets** im Pages-Projekt:
-   `GITHUB_TOKEN`, `GITHUB_REPO` (z. B. `khaledbakourcoder/checkinterne-website`),
+   `CMS_GITHUB_TOKEN`, `CMS_GITHUB_REPO` (z. B. `khaledbakourcoder/checkinterne-website`) – Cloudflare verbietet Namen, die mit `GITHUB_` beginnen –
    `ACCESS_TEAM_DOMAIN` (z. B. `checkinterne.cloudflareaccess.com`), `ACCESS_AUD` (AUD-Tag der Access-Anwendung),
    `ERLAUBTE_EMAILS` (Komma-Liste), optional `CMS_VORSCHAU_URL` (Adresse des `entwurf`-Vorschau-Builds).
 
