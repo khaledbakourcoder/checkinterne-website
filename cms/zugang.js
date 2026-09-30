@@ -34,11 +34,36 @@ function tokenAus(request) {
   return cookie.match(/(?:^|;\s*)CF_Authorization=([^;]+)/)?.[1] ?? null;
 }
 
+// Vergleich über SHA-256, damit die Laufzeit nichts über das Passwort verrät
+async function gleich(a, b) {
+  const [x, y] = await Promise.all([a, b].map((t) => crypto.subtle.digest('SHA-256', new TextEncoder().encode(t))));
+  const u = new Uint8Array(x), v = new Uint8Array(y);
+  let diff = 0;
+  for (let i = 0; i < u.length; i++) diff |= u[i] ^ v[i];
+  return diff === 0;
+}
+
+// Testmodus ohne Cloudflare Access: Anmeldefenster des Browsers (HTTP Basic Auth) mit einem Passwort.
+// Nur gedacht, bis Access eingerichtet ist – sobald ACCESS_* gesetzt sind, gilt ausschließlich Access.
+async function pruefePasswort(request, passwort) {
+  const fehlt = () => Object.assign(new CmsFehler(401, 'Bitte anmelden.'), { basic: true });
+  const kopf = request.headers.get('Authorization') ?? '';
+  if (!kopf.startsWith('Basic ')) throw fehlt();
+  let klartext;
+  try { klartext = new TextDecoder().decode(base64url(kopf.slice(6).trim())); } catch { throw fehlt(); }
+  const eingabe = klartext.slice(klartext.indexOf(':') + 1);
+  if (!(await gleich(eingabe, passwort))) throw fehlt();
+  return { email: 'test@passwort' };
+}
+
 // env: ACCESS_TEAM_DOMAIN (z. B. checkinterne.cloudflareaccess.com), ACCESS_AUD, ERLAUBTE_EMAILS (Komma-Liste)
+// oder für Tests nur TEST_PASSWORT (mindestens 12 Zeichen)
 export async function pruefeZugang(request, env) {
   const team = env.ACCESS_TEAM_DOMAIN;
   const aud = env.ACCESS_AUD;
   const erlaubt = (env.ERLAUBTE_EMAILS ?? '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+  const testPasswort = env.TEST_PASSWORT ?? '';
+  if (!team && !aud && testPasswort.length >= 12) return pruefePasswort(request, testPasswort);
   if (!team || !aud || !erlaubt.length) throw new CmsFehler(503, 'Dashboard ist noch nicht eingerichtet (Zugangsdaten fehlen).');
 
   const token = tokenAus(request);

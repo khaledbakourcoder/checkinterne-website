@@ -46,6 +46,10 @@ npm run cms      # Dashboard: http://127.0.0.1:4322/admin/ (schreibt direkt in i
 
 Ohne diese Variablen verweigert das Dashboard jeden Zugriff (fail closed).
 
+**Testmodus ohne Access:** Statt der drei `ACCESS_*`/`ERLAUBTE_EMAILS`-Variablen nur `TEST_PASSWORT` (mind. 12 Zeichen)
+setzen. Dann fragt der Browser beim Öffnen von `/admin/` nach Benutzername (beliebig) und Passwort.
+Sobald `ACCESS_TEAM_DOMAIN` oder `ACCESS_AUD` gesetzt ist, gilt nur noch Access – vor dem Livegang umstellen.
+
 ## Was der Kunde im Dashboard darf
 
 - **Nur Vorhandenes bearbeiten:** Texte und Fotos der bestehenden Baustellen, Leistungen, Startseite, Über uns, Einsatzgebiet und Kontaktdaten.

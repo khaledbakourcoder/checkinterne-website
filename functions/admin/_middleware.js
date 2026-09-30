@@ -8,7 +8,11 @@ export async function onRequest({ request, env, next }) {
   } catch (e) {
     return new Response(`Kein Zugang: ${e.message}`, {
       status: e.status ?? 401,
-      headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' },
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex',
+        // Testmodus: Browser zeigt sein Anmeldefenster
+        ...(e.basic ? { 'WWW-Authenticate': 'Basic realm="Checkinterne Dashboard", charset="UTF-8"' } : {}),
+      },
     });
   }
   const antwort = await next();

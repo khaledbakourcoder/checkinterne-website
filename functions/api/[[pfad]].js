@@ -6,6 +6,7 @@
 //   ACCESS_AUD          „Application Audience (AUD) Tag“ der Access-Anwendung
 //   ERLAUBTE_EMAILS     Komma-Liste der E-Mail-Adressen mit Zugang
 //   CMS_VORSCHAU_URL    optional, Adresse der Entwurfs-Vorschau (z. B. https://entwurf.checkinterne.pages.dev)
+//   TEST_PASSWORT       nur zum Testen ohne Access (mind. 12 Zeichen): Browser-Anmeldefenster statt E-Mail-Code
 import { bearbeite } from '../../cms/kern.js';
 import { githubSpeicher } from '../../cms/speicher-github.js';
 import { pruefeZugang } from '../../cms/zugang.js';
