@@ -1,0 +1,20 @@
+{
+  "titel": "Ein Dachgeschoss voller Flecken",
+  "ort": "",
+  "leistungen": ["malerarbeiten-flensburg"],
+  "absaetze": [
+    "Alte Tapete, Wasserflecken, ausgebrochene Stellen. Wir haben alles runtergeholt, die Schrägen gespachtelt, geschliffen und gestrichen, bis man keine Übergänge mehr sieht."
+  ],
+  "bilder": [
+    { "datei": "dg-1.jpg", "beschriftung": "So sah es aus", "alt": "Dachschräge mit alten Tapetenresten" },
+    { "datei": "dg-2.jpg", "beschriftung": "Tapete runter", "alt": "Tapete wird entfernt, Boden abgedeckt" },
+    { "datei": "dg-3.jpg", "beschriftung": "Der Untergrund", "alt": "Fleckige Dachschräge vor dem Spachteln" },
+    { "datei": "dg-4.jpg", "beschriftung": "Gespachtelt", "alt": "Schräge teilweise gespachtelt" },
+    { "datei": "dg-6.jpg", "beschriftung": "Glatt und weiß", "alt": "Glatte weiße Dachschräge mit Fenster" }
+  ],
+  "aufStartseite": true,
+  "reihenfolge": 2,
+  "seoTitel": "",
+  "seoBeschreibung": "",
+  "entwurf": false
+}

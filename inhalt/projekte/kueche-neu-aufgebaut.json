@@ -1,0 +1,20 @@
+{
+  "titel": "Eine Küche, die erst mal keine war",
+  "ort": "",
+  "leistungen": ["malerarbeiten-flensburg", "altbausanierung-flensburg"],
+  "absaetze": [
+    "Die Wand war offen, die Leitungen lagen frei. Wir haben verputzt, die Wand hinter der Arbeitsplatte dunkel gestrichen, die Holzplatte eingepasst und die Küche montiert."
+  ],
+  "bilder": [
+    { "datei": "kueche-1.jpg", "beschriftung": "Am Anfang", "alt": "Küche im Rohzustand: offene Wand, alte Unterschränke" },
+    { "datei": "kueche-2.jpg", "beschriftung": "Arbeitsplatte drin", "alt": "Neue Arbeitsplatte aus Holz, Wand frisch verputzt" },
+    { "datei": "kueche-3.jpg", "beschriftung": "Wand gestrichen", "alt": "Dunkle Wand und Spüle, fast fertig" },
+    { "datei": "kueche-4.jpg", "beschriftung": "Fertig", "alt": "Fertige Küche mit Holzarbeitsplatte und Spüle" },
+    { "datei": "kueche-5.jpg", "beschriftung": "Andere Seite", "alt": "Fertige Küche mit Blick auf die Terrassentür" }
+  ],
+  "aufStartseite": true,
+  "reihenfolge": 1,
+  "seoTitel": "",
+  "seoBeschreibung": "",
+  "entwurf": false
+}

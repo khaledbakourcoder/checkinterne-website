@@ -1,0 +1,34 @@
+---
+// Optimiertes Bild: AVIF/WebP mit JPEG-Rückfall, feste Maße (kein Layout-Springen), Lazy Loading.
+import { Picture } from 'astro:assets';
+import { bildDaten } from '../lib/inhalt';
+
+interface Props {
+  datei: string;
+  alt: string;
+  class?: string;
+  breite?: number;        // größte ausgelieferte Breite
+  sizes?: string;
+  eager?: boolean;        // sofort laden (sichtbar ohne Scrollen)
+  wichtig?: boolean;      // größtes Bild oben: mit Vorrang laden
+  quadrat?: boolean;      // für Fotoreihen: quadratisch zuschneiden
+}
+const { datei, alt, class: klasse, breite = 900, sizes = '(min-width: 960px) 25vw, 78vw', eager = false, wichtig = false, quadrat = false } = Astro.props;
+const quelle = bildDaten(datei);
+const w = Math.min(breite, quelle.width);
+const h = quadrat ? w : Math.round((quelle.height / quelle.width) * w);
+const breiten = [Math.round(w / 2), w].filter((x, i, a) => a.indexOf(x) === i);
+---
+<Picture
+  src={quelle}
+  alt={alt}
+  class={klasse}
+  width={w}
+  height={h}
+  widths={breiten}
+  sizes={sizes}
+  formats={['avif', 'webp']}
+  fit={quadrat ? 'cover' : undefined}
+  loading={eager || wichtig ? 'eager' : 'lazy'}
+  fetchpriority={wichtig ? 'high' : undefined}
+/>

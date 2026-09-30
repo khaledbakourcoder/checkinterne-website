@@ -1,0 +1,29 @@
+{
+  "name": "Altbau- und Wohnungssanierung",
+  "kurzname": "Sanierung",
+  "kurz": "Ganze Wohnungen, Altbauten, Schimmelsanierung – alles aus einer Hand",
+  "ueberschrift": "Altbausanierung in Flensburg und Umgebung",
+  "einleitung": [
+    "Oft bleibt es nicht bei einem Raum. Wir sanieren ganze Wohnungen: Wände, Böden, Bad, Leitungen – koordiniert von einem Ansprechpartner. Die meisten unserer Baustellen sind Altbauten, in denen nichts mehr gerade ist.",
+    "Bei Schimmel suchen wir zuerst die Ursache und beheben sie, bevor irgendetwas gestrichen wird."
+  ],
+  "leistungsliste": [
+    "Entkernen und Rückbau",
+    "Wände verputzen und begradigen",
+    "Trockenlegung und Schimmelsanierung",
+    "Böden, Bad, Malerarbeiten aus einer Hand",
+    "Halbfertige Wohnungen fertigstellen"
+  ],
+  "fragen": [
+    { "frage": "Übernehmen Sie auch eine halbfertige Wohnung?", "antwort": "Ja. Wir haben zum Beispiel in Flensburg eine halbfertige Wohnung mit Bodenbelag und Malerarbeiten fertiggestellt." },
+    { "frage": "Wer ist mein Ansprechpartner?", "antwort": "Ich selbst, Yordan Genchev. Ich komme zur Besichtigung und bin auch auf der Baustelle." }
+  ],
+  "bilder": [
+    { "datei": "altbau-1.jpg", "beschriftung": "Entkernter Raum", "alt": "Entkernter Raum im Altbau" },
+    { "datei": "altbau-2.jpg", "beschriftung": "Freigelegtes Mauerwerk", "alt": "Freigelegtes Mauerwerk" }
+  ],
+  "reihenfolge": 6,
+  "seoTitel": "Altbausanierung in Flensburg – Checkinterne GmbH",
+  "seoBeschreibung": "Altbau und ganze Wohnungen sanieren in Flensburg und Umgebung – inklusive Schimmelsanierung an der Ursache. Ein Ansprechpartner für alles.",
+  "entwurf": true
+}

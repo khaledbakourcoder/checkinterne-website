@@ -1,0 +1,29 @@
+{
+  "name": "Fliesenarbeiten",
+  "kurzname": "Fliesen",
+  "kurz": "Wand- und Bodenfliesen, Flur, Gäste-WC, Balkonfliesen",
+  "ueberschrift": "Fliesenleger in Flensburg und Umgebung",
+  "einleitung": [
+    "Wir fliesen Bäder, Flure, Küchen, Gäste-WCs und Balkone. Auch große Formate verlegen wir, zum Beispiel 60 × 120.",
+    "Wichtig ist der Untergrund: Ist er uneben, gleichen wir ihn vorher aus. Sonst sieht man es später an jeder Fuge."
+  ],
+  "leistungsliste": [
+    "Wand- und Bodenfliesen innen",
+    "Große Formate bis 60 × 120",
+    "Untergrund ausgleichen und vorbereiten",
+    "Balkone mit Klickfliesen – oft an einem Tag",
+    "Fugen erneuern"
+  ],
+  "fragen": [
+    { "frage": "Verlegen Sie auch Fliesen auf dem Balkon?", "antwort": "Ja. Wir reinigen den Balkon gründlich und verlegen dann zum Beispiel Klickfliesen. Das geht oft an einem Tag." },
+    { "frage": "Können Sie auch nur ein Gäste-WC oder einen Flur fliesen?", "antwort": "Ja, auch kleinere Flächen übernehmen wir." }
+  ],
+  "bilder": [
+    { "datei": "fliesen-wand.jpg", "beschriftung": "Große Wandfliesen werden verlegt", "alt": "Fliesenleger verlegt große weiße Wandfliesen mit Nivelliersystem" },
+    { "datei": "balkon-5.jpg", "beschriftung": "Balkon mit Klickfliesen", "alt": "Balkon mit grauen Klickfliesen in der Sonne" }
+  ],
+  "reihenfolge": 2,
+  "seoTitel": "Fliesenleger in Flensburg – Checkinterne GmbH",
+  "seoBeschreibung": "Fliesen für Bad, Flur, Küche und Balkon in Flensburg und Umgebung. Auch große Formate bis 60 × 120. Jetzt anrufen oder Fotos per WhatsApp schicken.",
+  "entwurf": true
+}

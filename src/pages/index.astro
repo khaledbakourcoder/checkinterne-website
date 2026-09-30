@@ -1,0 +1,176 @@
+---
+import Seite from '../layouts/Seite.astro';
+import Bild from '../components/Bild.astro';
+import Karte from '../components/Karte.astro';
+import Zettel from '../components/Zettel.astro';
+import {
+  einstellungen as e, startseite as s, ueberUns, orte, bewertungen as bw, projekte,
+  alleLeistungenFuerListe, istOnline, url, telLink, whatsappLink,
+} from '../lib/inhalt';
+
+const startProjekte = projekte.filter((p) => p.aufStartseite);
+const filterLeistungen = alleLeistungenFuerListe.filter((l) => bw.liste.some((b) => b.leistungen.includes(l.id)));
+const verteilung = [5, 4, 3, 2, 1].map((n) => {
+  const anzahl = bw.verteilung[String(n) as '5'];
+  return { n, anzahl, anteil: bw.anzahl ? Math.round((anzahl / bw.anzahl) * 1000) / 10 : 0 };
+});
+---
+<Seite titel={s.seoTitel} beschreibung={s.seoBeschreibung} ogBild={s.pinnwand[1]}>
+
+  <section class="anfang" id="anfang">
+    <div class="pinnwand" aria-hidden="true">
+      <Bild datei={s.pinnwand[0]} alt="" class="p1" breite={600} sizes="(min-width: 960px) 28vw, 52vw" wichtig />
+      <Bild datei={s.pinnwand[1]} alt="" class="p2" breite={600} sizes="(min-width: 960px) 26vw, 50vw" quadrat eager />
+      <Bild datei={s.pinnwand[2]} alt="" class="p3" breite={600} sizes="(min-width: 960px) 23vw, 44vw" quadrat eager />
+    </div>
+    <div class="anfang-text">
+      <h1>{s.ueberschrift}</h1>
+      {s.einleitung && <p>{s.einleitung}</p>}
+      <p class="ruf">Rufen Sie einfach an:<br><a href={telLink()}>{e.telefonAnzeige}</a></p>
+      <p class="klein">Oder schicken Sie ein paar Fotos per <a href={whatsappLink()}>WhatsApp</a>. Dann kann ich schon vorher sagen, was ungefähr auf Sie zukommt.</p>
+    </div>
+  </section>
+
+  <section class="baustellen" id="baustellen">
+    <h2>{s.baustellenUeberschrift}</h2>
+    {s.baustellenVorwort && <p class="vorwort">{s.baustellenVorwort}</p>}
+
+    {startProjekte.map((p, i) => (
+      <article class:list={['bau', { 'bau-rechts': i % 2 === 1 }]}>
+        <h3><a class="bau-link" href={url.projekt(p.id)}>{p.titel}</a></h3>
+        <p>{p.absaetze[0]}</p>
+        <ul class="reihe">
+          {p.bilder.map((b) => (
+            <li><Bild datei={b.datei} alt={b.alt} quadrat breite={700} />{b.beschriftung && <span>{b.beschriftung}</span>}</li>
+          ))}
+        </ul>
+      </article>
+    ))}
+
+    {s.altbauBilder.length > 0 && <>
+      <p class="nachwort">{s.altbauText}</p>
+      <ul class="reihe reihe-klein">
+        {s.altbauBilder.map((b) => <li><Bild datei={b.datei} alt={b.alt} quadrat breite={500} sizes="(min-width: 960px) 18vw, 46vw" /></li>)}
+      </ul>
+    </>}
+  </section>
+
+  <section class="stimmen" id="bewertungen">
+    <h2>{bw.ueberschrift}</h2>
+
+    <div class="bilanz">
+      <p class="bilanz-note"><b>{bw.note}</b><span class="sterne" aria-hidden="true">★★★★★</span></p>
+      <p class="bilanz-text">{bw.bilanzText}</p>
+      <ul class="verteilung" aria-label="Verteilung der Sterne">
+        {verteilung.map((v) => <li><span>{v.n} {v.n === 1 ? 'Stern' : 'Sterne'}</span><i style={`--anteil:${v.anteil}%`}></i><b>{v.anzahl}</b></li>)}
+      </ul>
+    </div>
+
+    <div class="filter" role="group" aria-label="Bewertungen nach Arbeit filtern">
+      <button type="button" aria-pressed="true" data-leistung="alle">Alle</button>
+      {filterLeistungen.map((l) => <button type="button" aria-pressed="false" data-leistung={l.id}>{l.kurzname}</button>)}
+    </div>
+
+    <div class="zettelwand" id="zettelwand" aria-live="polite">
+      {bw.liste.map((b, i) => <Zettel b={b} i={i} />)}
+    </div>
+    <button type="button" class="mehr" id="mehr" hidden>Weitere Bewertungen zeigen</button>
+
+    {(bw.ehrlichTitel || bw.ehrlichAbsaetze.length > 0) && (
+      <div class="ehrlich">
+        <h3>{bw.ehrlichTitel}</h3>
+        {bw.ehrlichAbsaetze.map((a) => <p>{a}</p>)}
+        {bw.quelleUrl && <p class="klein"><a class="pfeil-link" href={bw.quelleUrl} rel="noopener">Alle {bw.anzahl} Bewertungen auf {bw.quelle} lesen</a></p>}
+      </div>
+    )}
+  </section>
+
+  <section class="ich" id="ueber-uns">
+    <Bild datei={ueberUns.bild} alt={ueberUns.bildAlt} class="ich-bild" breite={640} sizes="(min-width: 960px) 340px, 78vw" />
+    <div class="ich-text">
+      <h2>{ueberUns.ueberschrift}</h2>
+      {ueberUns.absaetze.map((a) => <p>{a}</p>)}
+      {ueberUns.unterschrift && <p class="unterschrift">{ueberUns.unterschrift}</p>}
+    </div>
+  </section>
+
+  <section class="leistungen" id="leistungen">
+    <h2>{s.leistungenUeberschrift}</h2>
+    <dl>
+      {alleLeistungenFuerListe.map((l) => <>
+        <dt>{istOnline(l.id) ? <a class="pfeil-link" href={url.leistung(l.id)}>{l.name}</a> : l.name}</dt>
+        <dd>{l.kurz}</dd>
+      </>)}
+    </dl>
+    {s.weitereArbeiten && <p class="weitere">{s.weitereArbeiten}</p>}
+  </section>
+
+  <section class="orte" id="orte">
+    <h2>{orte.ueberschrift}</h2>
+    {orte.vorwort && <p class="vorwort">{orte.vorwort}</p>}
+    <Karte />
+    <div class="zonen">
+      {orte.zonen.map((z) => (
+        <div class="zone">
+          <h3>{z.titel} {z.entfernung && <small>{z.entfernung}</small>}</h3>
+          <p>{z.orte}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="kontakt" id="kontakt">
+    <h2>{s.kontaktUeberschrift}</h2>
+    {s.kontaktText && <p>{s.kontaktText}</p>}
+    <p class="ruf"><a href={telLink()}>{e.telefonAnzeige}</a></p>
+    <p>Fotos schicken Sie am besten per <a href={whatsappLink()}>WhatsApp</a>. Oder Sie schreiben uns hier:</p>
+    <!-- TODO: Formular-Ziel festlegen (einstellungen.formularZiel) -->
+    <form action={e.formularZiel || `mailto:${e.email || 'info@example.de'}`} method="post" enctype={e.formularZiel ? undefined : 'text/plain'}>
+      <label for="f-name">Ihr Name</label>
+      <input id="f-name" name="name" autocomplete="name" required>
+      <label for="f-tel">Telefon, damit ich zurückrufen kann</label>
+      <input id="f-tel" name="telefon" type="tel" inputmode="tel" autocomplete="tel" required>
+      <label for="f-was">Was soll gemacht werden, und wo?</label>
+      <textarea id="f-was" name="nachricht" rows="5"></textarea>
+      <label class="haken"><input type="checkbox" required> Meine Angaben dürfen für die Anfrage genutzt werden. <a href={e.datenschutzUrl || '#'}>Datenschutz</a></label>
+      <button type="submit">Abschicken</button>
+    </form>
+  </section>
+
+</Seite>
+
+<script>
+  // Bewertungen filtern: alle stehen im HTML (für Google), das Skript blendet nur ein und aus.
+  const ANFANG = 6;
+  const dreh = [-1.2, 0.8, -0.4, 1.5, -0.9, 0.3, 1.1, -1.6, 0.6, -0.2];
+  const kreppX = ['38%', '12%', '62%', '30%', '52%', '20%'];
+  const zettel = [...document.querySelectorAll<HTMLElement>('#zettelwand .zettel')];
+  const mehr = document.getElementById('mehr') as HTMLButtonElement | null;
+  const knoepfe = [...document.querySelectorAll<HTMLButtonElement>('.filter button')];
+  let auswahl = 'alle';
+  let alles = false;
+
+  function zeigen() {
+    const passend = zettel.filter((z) => auswahl === 'alle' || (z.dataset.leistungen ?? '').split(' ').includes(auswahl));
+    zettel.forEach((z) => (z.hidden = true));
+    passend.forEach((z, i) => {
+      z.hidden = !alles && i >= ANFANG;
+      z.style.setProperty('--dreh', `${dreh[i % dreh.length]}deg`);
+      z.style.setProperty('--krepp-x', kreppX[i % kreppX.length]);
+      z.style.setProperty('--krepp-dreh', `${i % 2 ? 4 : -3}deg`);
+    });
+    if (mehr) {
+      mehr.hidden = alles || passend.length <= ANFANG;
+      mehr.textContent = `Weitere ${passend.length - ANFANG} Bewertungen zeigen`;
+    }
+  }
+
+  knoepfe.forEach((k) => k.addEventListener('click', () => {
+    auswahl = k.dataset.leistung ?? 'alle';
+    alles = false;
+    knoepfe.forEach((x) => x.setAttribute('aria-pressed', String(x === k)));
+    zeigen();
+  }));
+  mehr?.addEventListener('click', () => { alles = true; zeigen(); });
+  zeigen();
+</script>

@@ -1,0 +1,234 @@
+---
+import '../styles/seite.css';
+import { getImage } from 'astro:assets';
+import { einstellungen as e, orte, leistungen, url, telLink, whatsappLink, bildDaten } from '../lib/inhalt';
+
+interface Props {
+  titel: string;
+  beschreibung: string;
+  ogBild?: string;                               // Dateiname aus src/assets/bilder
+  brotkrumen?: { name: string; pfad: string }[]; // ohne Startseite
+  jsonLd?: Record<string, unknown>[];
+}
+const { titel, beschreibung, ogBild, brotkrumen = [], jsonLd = [] } = Astro.props;
+const basis = e.domain.replace(/\/$/, '');
+const kanonisch = basis + Astro.url.pathname;
+// Vorschau-Build mit Entwürfen: nie von Suchmaschinen erfassen lassen
+const vorschau = import.meta.env.PUBLIC_ENTWUERFE_ZEIGEN === 'ja';
+const og = ogBild ? await getImage({ src: bildDaten(ogBild), width: 1200, format: 'jpg' }) : undefined;
+
+// Platzhalternummer (+49000…) nicht als echte Nummer an Google melden
+const echteNummer = !/^\+?490*$/.test(e.telefon.replace(/\s/g, ''));
+const firma: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': basis + '/#firma',
+  name: e.firma,
+  url: basis + '/',
+  founder: { '@type': 'Person', name: e.inhaber },
+  address: { '@type': 'PostalAddress', streetAddress: e.strasse, postalCode: e.plz, addressLocality: e.ort, addressCountry: 'DE' },
+  areaServed: orte.zonen.flatMap((z) => z.orte.split(',').map((o) => ({ '@type': 'City', name: o.trim() }))).filter((o) => o.name),
+  sameAs: [e.myhammerUrl].filter(Boolean),
+};
+if (echteNummer) firma.telephone = e.telefon;
+if (e.email) firma.email = e.email;
+
+const krumen = brotkrumen.length ? [{
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [{ name: 'Startseite', pfad: '/' }, ...brotkrumen].map((k, i) => ({
+    '@type': 'ListItem', position: i + 1, name: k.name, item: basis + k.pfad,
+  })),
+}] : [];
+const daten = [firma, ...krumen, ...jsonLd];
+---
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{titel}</title>
+  <meta name="description" content={beschreibung}>
+  <link rel="canonical" href={kanonisch}>
+  {vorschau && <meta name="robots" content="noindex, nofollow">}
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:site_name" content={e.firma}>
+  <meta property="og:title" content={titel}>
+  <meta property="og:description" content={beschreibung}>
+  <meta property="og:url" content={kanonisch}>
+  {og && <meta property="og:image" content={basis + og.src}>}
+  <!-- TODO vor Livegang: Schrift lokal hosten (DSGVO) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  {daten.map((d) => <script type="application/ld+json" set:html={JSON.stringify(d).replace(/</g, '\\u003c')} />)}
+</head>
+<body>
+
+<header class="kopf">
+  <a class="marke" href="/">{e.markeKurz}<small>{e.markeZusatz}</small></a>
+  <button type="button" class="menue-knopf" aria-expanded="false" aria-controls="hauptnav">Menü</button>
+  <nav class="hauptnav" id="hauptnav" aria-label="Hauptmenü">
+    <ul>
+      <li class="nav-leistungen">
+        {leistungen.length > 0 ? (
+          <>
+            <button type="button" class="nav-klapp" aria-expanded="false" aria-controls="nav-leistungsliste">Leistungen</button>
+            <ul id="nav-leistungsliste" class="nav-liste">
+              <li class="nav-liste-titel" aria-hidden="true">Was wir machen</li>
+              {leistungen.map((l) => (
+                <li>
+                  <a href={url.leistung(l.id)} aria-current={Astro.url.pathname === url.leistung(l.id) ? 'page' : undefined}>
+                    <span class="name">{l.name}</span>
+                    <span class="linie" aria-hidden="true"></span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : <a href="/#leistungen">Leistungen</a>}
+      </li>
+      <li><a href="/#baustellen">Baustellen</a></li>
+      <li><a href="/#ueber-uns">Über uns</a></li>
+      <li><a href="/#kontakt">Kontakt</a></li>
+    </ul>
+  </nav>
+  <a class="kopf-anruf" href={telLink()}><span class="nur-breit">Jetzt anrufen</span><span class="nur-schmal">Anrufen</span></a>
+</header>
+
+<script>
+  // Menü auf dem Handy und Aufklappliste „Leistungen“ – per Klick, nicht per Maus-Darüberfahren
+  const kopf = document.querySelector<HTMLElement>('.kopf');
+  const menueKnopf = kopf?.querySelector<HTMLButtonElement>('.menue-knopf');
+  const klapp = kopf?.querySelector<HTMLButtonElement>('.nav-klapp');
+  const umschalten = (knopf: HTMLButtonElement, auf?: boolean) => {
+    const offen = auf ?? knopf.getAttribute('aria-expanded') !== 'true';
+    knopf.setAttribute('aria-expanded', String(offen));
+  };
+  menueKnopf?.addEventListener('click', () => umschalten(menueKnopf));
+  klapp?.addEventListener('click', () => umschalten(klapp));
+  // Schließen bei Klick daneben, bei Esc und nach Klick auf einen Link
+  document.addEventListener('click', (e) => {
+    if (kopf && !kopf.contains(e.target as Node)) {
+      if (menueKnopf) umschalten(menueKnopf, false);
+      if (klapp) umschalten(klapp, false);
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (klapp?.getAttribute('aria-expanded') === 'true') { umschalten(klapp, false); klapp.focus(); }
+    else if (menueKnopf?.getAttribute('aria-expanded') === 'true') { umschalten(menueKnopf, false); menueKnopf.focus(); }
+  });
+  kopf?.querySelectorAll('.hauptnav a').forEach((a) => a.addEventListener('click', () => {
+    if (menueKnopf) umschalten(menueKnopf, false);
+    if (klapp) umschalten(klapp, false);
+  }));
+
+  // Seitliche Fotoreihen (Handy/Tablet): ein Strich pro Foto unter der Reihe.
+  // Sichtbare Fotos werden zum Kreppband; Antippen eines Strichs holt das Foto in die Mitte.
+  document.querySelectorAll<HTMLUListElement>('ul.reihe').forEach((reihe) => {
+    const rahmen = document.createElement('div');
+    rahmen.className = 'reihe-rahmen';
+    reihe.before(rahmen);
+    rahmen.append(reihe);
+    const fotos = [...reihe.children] as HTMLElement[];
+    const striche = document.createElement('div');
+    striche.className = 'reihe-striche';
+    const knoepfe = fotos.map((foto, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', `Foto ${i + 1} von ${fotos.length} zeigen`);
+      b.addEventListener('click', () => {
+        const links = foto.offsetLeft - (reihe.clientWidth - foto.offsetWidth) / 2;
+        reihe.scrollTo({ left: links, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      });
+      striche.append(b);
+      return b;
+    });
+    rahmen.append(striche);
+
+    // Ein Foto gilt als sichtbar, wenn mindestens 60 % davon im Ausschnitt liegen
+    const markieren = () => {
+      const r = reihe.getBoundingClientRect();
+      fotos.forEach((foto, i) => {
+        const f = foto.getBoundingClientRect();
+        const anteil = (Math.min(f.right, r.right) - Math.max(f.left, r.left)) / f.width;
+        const an = anteil >= 0.6;
+        knoepfe[i].classList.toggle('aktiv', an);
+        if (an) knoepfe[i].setAttribute('aria-current', 'true'); else knoepfe[i].removeAttribute('aria-current');
+      });
+    };
+
+    const aktualisieren = () => {
+      markieren();
+      // Striche nur, wenn es wirklich etwas zu blättern gibt (auf dem Laptop stehen alle Fotos im Raster)
+      rahmen.classList.toggle('blaetterbar', reihe.scrollWidth > reihe.clientWidth + 4);
+    };
+    reihe.addEventListener('scroll', aktualisieren, { passive: true });
+    addEventListener('resize', aktualisieren);
+    aktualisieren();
+  });
+</script>
+
+{brotkrumen.length > 0 && (
+  <nav class="brotkrumen" aria-label="Sie sind hier">
+    <a href="/">Startseite</a>
+    {brotkrumen.map((k, i) => i === brotkrumen.length - 1
+      ? <span aria-current="page">{k.name}</span>
+      : <a href={k.pfad}>{k.name}</a>)}
+  </nav>
+)}
+
+<main>
+  <slot />
+</main>
+
+<footer class="fuss">
+  <div class="fuss-oben">
+    <!-- Bauschild: Firmenangaben. Name, Adresse und Telefon an einer Stelle – wichtig für die lokale Google-Suche -->
+    <div class="bauschild">
+      <p class="bauschild-kopf">Hier arbeitet</p>
+      <p class="bauschild-firma">{e.firma}</p>
+      <dl>
+        <div><dt>Bauleitung</dt><dd>{e.inhaber}</dd></div>
+        <div><dt>Adresse</dt><dd>{[e.strasse, [e.plz, e.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ')}</dd></div>
+        <div><dt>Einsatzgebiet</dt><dd>{e.einsatzgebiet}</dd></div>
+        <div><dt>Telefon</dt><dd><a href={telLink()}>{e.telefonAnzeige}</a></dd></div>
+        <div><dt>WhatsApp</dt><dd><a href={whatsappLink()}>Fotos schicken</a></dd></div>
+      </dl>
+    </div>
+
+    <nav class="fuss-spalte" aria-labelledby="fuss-leistungen">
+      <h2 class="fuss-titel" id="fuss-leistungen">Leistungen</h2>
+      <ul>
+        {leistungen.length > 0
+          ? leistungen.map((l) => <li><a class="fuss-link" href={url.leistung(l.id)}>{l.name}</a></li>)
+          : <li><a class="fuss-link" href="/#leistungen">Was wir machen</a></li>}
+      </ul>
+    </nav>
+
+    <nav class="fuss-spalte" aria-labelledby="fuss-weiteres">
+      <h2 class="fuss-titel" id="fuss-weiteres">Weiteres</h2>
+      <ul>
+        <li><a class="fuss-link" href="/#baustellen">Baustellen</a></li>
+        <li><a class="fuss-link" href="/#ueber-uns">Über uns</a></li>
+        <li><a class="fuss-link" href="/#kontakt">Kontakt</a></li>
+        {e.myhammerUrl && <li><a class="fuss-link" href={e.myhammerUrl} rel="noopener">Profil auf MyHammer</a></li>}
+      </ul>
+    </nav>
+  </div>
+
+  <div class="fuss-unten">
+    <p>© {new Date().getFullYear()} {e.firma}</p>
+    <nav class="fuss-recht" aria-label="Rechtliches">
+      <a class="fuss-link" href={e.impressumUrl || '#'}>Impressum</a>
+      <a class="fuss-link" href={e.datenschutzUrl || '#'}>Datenschutz</a>
+    </nav>
+    <a class="fuss-link nach-oben" href="#">Nach oben</a>
+  </div>
+</footer>
+
+</body>
+</html>

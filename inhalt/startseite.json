@@ -1,0 +1,21 @@
+{
+  "seoTitel": "Checkinterne GmbH · Yordan Genchev · Sanierung in Flensburg",
+  "seoBeschreibung": "Bäder, Böden, Wände und ganze Wohnungen – Yordan Genchev und Team sanieren in Flensburg und ganz Schleswig-Holstein. Baustellenfotos und 43 Bewertungen.",
+  "ueberschrift": "Wir sanieren Bäder, Böden, Wände – und oft gleich die ganze Wohnung.",
+  "einleitung": "Seit 2005 bin ich auf dem Bau, heute mit einem kleinen Team und meinem Sohn. Wir arbeiten von Flensburg aus, meistens in Altbauten, in denen nichts mehr gerade ist.",
+  "pinnwand": ["arbeit-dach.jpg", "kueche-4.jpg", "holzbad-2.jpg"],
+  "baustellenUeberschrift": "Drei Baustellen von Anfang bis Ende",
+  "baustellenVorwort": "Die Fotos machen wir selbst, mit dem Handy, während wir arbeiten. Darum sind sie nicht schön ausgeleuchtet – aber sie zeigen, was hinter der Wand passiert.",
+  "altbauText": "Im Altbau sieht man die meiste Arbeit später gar nicht mehr: neue Leitungen, Vorwandinstallation, Ständerwerk. So sieht das aus, bevor die Platten draufkommen:",
+  "altbauBilder": [
+    { "datei": "altbau-1.jpg", "alt": "Entkernter Raum im Altbau" },
+    { "datei": "altbau-2.jpg", "alt": "Freigelegtes Mauerwerk" },
+    { "datei": "altbau-3.jpg", "alt": "Vorwandelemente für WC und Waschtisch" },
+    { "datei": "altbau-5.jpg", "alt": "Ständerwerk für neue Trockenbauwände" },
+    { "datei": "altbau-6.jpg", "alt": "Trockenbauwand mit markierten Anschlüssen" }
+  ],
+  "leistungenUeberschrift": "Was wir machen",
+  "weitereArbeiten": "Außerdem: Küchenmontage, Fenster und Türen, Fassade und Dämmung, kleinere Elektrik.",
+  "kontaktUeberschrift": "Erzählen Sie mir, worum es geht",
+  "kontaktText": "Am schnellsten geht es am Telefon. Wenn ich auf der Baustelle bin und nicht rangehe, rufe ich am selben Tag zurück."
+}

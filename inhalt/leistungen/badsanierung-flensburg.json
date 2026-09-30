@@ -1,0 +1,53 @@
+{
+  "name": "Badsanierung",
+  "kurzname": "Bad",
+  "kurz": "Komplettsanierung, Abdichtung, große Fliesenformate bis 60 × 120, Fugen erneuern",
+  "ueberschrift": "Badsanierung in Flensburg und Umgebung",
+  "einleitung": [
+    "Ein Bad sanieren wir meistens komplett: alte Fliesen raus, Wände gerade machen, abdichten, neu fliesen, Sanitär und Möbel montieren. Gerade in Altbauten ist das selten Standard – die Wände sind schief, und oft kommt beim Abschlagen mehr zum Vorschein, als man erwartet hat.",
+    "Deshalb komme ich vorher selbst zur Besichtigung. Dann sehen wir gemeinsam, was nötig ist, und Sie bekommen ein Angebot, das zu Ihrem Bad passt."
+  ],
+  "leistungsliste": [
+    "Altes Bad zurückbauen, Bauschutt entsorgen wir selbst",
+    "Wände verputzen und ins Lot bringen",
+    "Abdichtung im Nassbereich",
+    "Wand- und Bodenfliesen, auch große Formate bis 60 × 120",
+    "Vorwandinstallation für WC und Waschtisch",
+    "Fugen erneuern und kleinere Reparaturen"
+  ],
+  "fragen": [
+    {
+      "frage": "Wie lange dauert eine Badsanierung?",
+      "antwort": "Das hängt von der Größe und vom Zustand ab. Nach der Besichtigung bekommen Sie mit dem Angebot einen Zeitplan. Wenn sich etwas verschiebt, rufe ich vorher an."
+    },
+    {
+      "frage": "Arbeiten Sie auch in alten Häusern?",
+      "antwort": "Ja, das ist unser Alltag. Wir haben zum Beispiel ein Bad in einem über hundert Jahre alten Haus bis aufs Mauerwerk zurückgebaut, die Wände neu verputzt und mit Fliesen 60 × 120 gefliest."
+    },
+    {
+      "frage": "Nehmen Sie den Bauschutt mit?",
+      "antwort": "Ja. Wir haben eigene Fahrzeuge und entsorgen den Schutt selbst."
+    }
+  ],
+  "bilder": [
+    {
+      "datei": "bad-fertig.jpg",
+      "beschriftung": "Fertiges Bad mit Eckdusche",
+      "alt": "Fertig saniertes Bad mit Eckdusche und wandhängendem WC"
+    },
+    {
+      "datei": "bad-waschtisch.jpg",
+      "beschriftung": "Waschtisch wird montiert",
+      "alt": "Montage eines Doppelwaschtischs mit dunklen Aufsatzbecken"
+    },
+    {
+      "datei": "holzbad-2.jpg",
+      "beschriftung": "Bad mit Holzelementen",
+      "alt": "Saniertes Bad mit Holzelementen"
+    }
+  ],
+  "reihenfolge": 1,
+  "seoTitel": "Badsanierung in Flensburg – Checkinterne GmbH",
+  "seoBeschreibung": "Bad komplett sanieren in Flensburg und Umgebung: Rückbau, Abdichtung, Fliesen bis 60 × 120, Vorwandinstallation. Besichtigung durch den Chef.",
+  "entwurf": false
+}

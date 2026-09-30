@@ -1,0 +1,30 @@
+{
+  "name": "Malerarbeiten",
+  "kurzname": "Maler",
+  "kurz": "Spachteln, Tapezieren, Streichen, Lackieren, Schimmel an der Ursache beheben",
+  "ueberschrift": "Malerarbeiten in Flensburg und Umgebung",
+  "einleitung": [
+    "Schöne Wände fangen beim Untergrund an. Wir holen alte Tapeten runter, spachteln, schleifen und streichen – bis man keine Übergänge mehr sieht. Auch Dachschrägen und Gauben.",
+    "Beim Arbeiten decken wir Möbel und Böden ab, und nach jedem Arbeitstag wird aufgeräumt."
+  ],
+  "leistungsliste": [
+    "Alte Tapeten entfernen",
+    "Spachteln und Schleifen, auch schwierige Untergründe",
+    "Tapezieren, zum Beispiel mit Vliestapete",
+    "Wände und Decken streichen",
+    "Lackierarbeiten",
+    "Schimmel an der Ursache beheben, nicht nur überstreichen"
+  ],
+  "fragen": [
+    { "frage": "Streichen Sie auch über Schimmel?", "antwort": "Nein. Wir suchen zuerst die Ursache und beheben sie. Einfach überstreichen hilft nur kurz." },
+    { "frage": "Was passiert mit meinen Möbeln?", "antwort": "Wir decken Möbel und Böden sorgfältig ab und räumen nach jedem Arbeitstag auf." }
+  ],
+  "bilder": [
+    { "datei": "dg-6.jpg", "beschriftung": "Dachschräge nach dem Streichen", "alt": "Glatte weiße Dachschräge mit Fenster" },
+    { "datei": "dg-4.jpg", "beschriftung": "Gespachtelt", "alt": "Schräge teilweise gespachtelt" }
+  ],
+  "reihenfolge": 3,
+  "seoTitel": "Malerarbeiten in Flensburg – Checkinterne GmbH",
+  "seoBeschreibung": "Spachteln, Tapezieren und Streichen in Flensburg und Umgebung – auch Dachschrägen und schwierige Untergründe. Sauber, ordentlich, mit Zeitplan.",
+  "entwurf": true
+}

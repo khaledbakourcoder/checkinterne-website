@@ -1,0 +1,674 @@
+/* Variante 2 – „Baustellen-Album“
+   Weiße Wand, Arbeitsblau, Malerkrepp. Mobil zuerst, eine Schrift, keine Karten-Raster. */
+
+:root {
+  --wand: #ffffff;
+  --blau: #1F3F73;
+  --blau-tief: #142B52;
+  --blau-hell: #EAF0F8;
+  --rigips: #E4E6EA;
+  --krepp: #E9D98B;
+  --krepp-hell: #FAF3D2;
+  --krepp-rand: #D2BD63;
+  --text: #1A1A1A;
+  --leise: #555555;
+  --strich: #D5D8DD;
+  --rand: 20px;
+  --kopf-h: 64px;
+  --schrift: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", Verdana, sans-serif;
+  /* Papier an der Wand: flacher Schatten in Ruhe, angehoben beim Darüberfahren */
+  --schatten-ruhe: 0 1px 2px rgba(0,0,0,.14), 0 4px 10px -6px rgba(0,0,0,.35);
+  --schatten-hoch: 0 3px 6px rgba(0,0,0,.12), 0 14px 24px -12px rgba(0,0,0,.4);
+  --weich: 180ms cubic-bezier(.2,.7,.3,1);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--kopf-h) + 8px); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body { margin: 0; background: var(--wand); color: var(--text); font: 400 1.125rem/1.6 var(--schrift); }
+img { display: block; max-width: 100%; height: auto; }
+/* ---------- Links mit Handwerks-Charakter ----------
+   Keine Browser-Unterstreichung, sondern Werkstatt-Bilder:
+   – Ruhe: ein leicht unregelmäßiger Bleistiftstrich (wie mit dem Zimmermannsbleistift gezogen).
+     Er bleibt sichtbar, damit Links im Text erkennbar sind – nicht nur über die Farbe.
+   – Darüberfahren: ein gelber Zollstock mit Maßstrichen klappt von links nach rechts unter dem Wort aus.
+   – Eigenständige Links (.pfeil-link): von Hand gezeichneter Pfeil; darunter wird ein Bleistiftstrich „gezogen“. */
+:root {
+  --bleistift: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5.4C12 4.2 22 6 34 4.9S58 3.7 70 5.1 88 5.8 99 4.4' fill='none' stroke='%231F3F73' stroke-opacity='.6' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --pfeil: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 14'%3E%3Cpath d='M1.5 7.6C8 6.8 15 7.4 23.2 6.9M17.8 2.2c2 1.7 3.6 3.1 5.6 4.7-2.1 1.4-3.8 2.9-5.4 4.8' fill='none' stroke='%231F3F73' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  /* Zollstock: lange Maßstriche alle 30 px, kurze alle 6 px, auf gelbem Band */
+  --zollstock-lang: repeating-linear-gradient(90deg, rgba(20,43,82,.8) 0 1.5px, transparent 1.5px 30px);
+  --zollstock-kurz: repeating-linear-gradient(90deg, rgba(20,43,82,.55) 0 1px, transparent 1px 6px);
+  --zollstock-band: linear-gradient(var(--krepp), var(--krepp));
+}
+a { color: var(--blau); text-decoration: none; transition: color var(--weich); }
+
+/* Textlinks und alles, was den Zollstock bekommt */
+:where(main, .fuss) :where(p, dd, li, label, figcaption) a:not([class]), .bau-link {
+  padding: 0 2px 3px;
+  background-image: var(--zollstock-lang), var(--zollstock-kurz), var(--zollstock-band), var(--bleistift);
+  background-repeat: no-repeat;
+  background-position: 0 100%, 0 100%, 0 100%, 0 100%;
+  background-size: 0 7px, 0 4px, 0 9px, 100% 5px;
+  transition: background-size 260ms cubic-bezier(.3,.7,.2,1), color var(--weich);
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+:where(main, .fuss) :where(p, dd, li, label, figcaption) a:not([class]) { font-weight: 700; }
+:where(main, .fuss) :where(p, dd, li, label, figcaption) a:not([class]):hover, .bau-link:hover {
+  color: var(--blau-tief);
+  background-size: 100% 7px, 100% 4px, 100% 9px, 100% 5px;
+}
+
+.pfeil-link {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 700;
+  background: var(--bleistift) no-repeat 0 calc(100% - 6px) / 0 5px;
+  transition: background-size 260ms cubic-bezier(.3,.7,.2,1), color var(--weich);
+}
+.pfeil-link::after {
+  content: ""; flex: 0 0 26px; height: 14px; background: var(--pfeil) no-repeat center / contain;
+  transition: transform var(--weich);
+}
+.pfeil-link:hover { color: var(--blau-tief); background-size: calc(100% - 36px) 5px; }
+.pfeil-link:hover::after { transform: translateX(5px) rotate(-3deg); }
+:focus-visible { outline: 3px solid var(--blau); outline-offset: 3px; }
+h1, h2, h3 { margin: 0; font-weight: 800; line-height: 1.12; color: var(--blau); }
+h2 { font-size: 2.125rem; margin-bottom: 16px; max-width: 18ch; }
+h3 { font-size: 1.375rem; margin-bottom: 10px; }
+p { margin: 0 0 1em; max-width: 60ch; }
+.klein { font-size: 1rem; color: var(--leise); }
+.vorwort { color: var(--leise); }
+
+/* ---------- Kopfzeile ----------
+   Untere Kante als Maßband: lange Striche alle 50 px, kurze alle 10 px. */
+.kopf {
+  position: sticky; top: 0; z-index: 20; height: var(--kopf-h);
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 0 var(--rand);
+  background:
+    repeating-linear-gradient(90deg, rgba(20,43,82,.38) 0 1px, transparent 1px 50px) 0 100% / 100% 9px no-repeat,
+    repeating-linear-gradient(90deg, rgba(20,43,82,.2) 0 1px, transparent 1px 10px) 0 100% / 100% 5px no-repeat,
+    linear-gradient(var(--strich), var(--strich)) 0 100% / 100% 1px no-repeat,
+    var(--wand);
+}
+/* Karopapier wie auf dem Aufmaßblock */
+:root {
+  --karo:
+    linear-gradient(rgba(31,63,115,.07) 1px, transparent 1px) 0 0 / 100% 22px,
+    linear-gradient(90deg, rgba(31,63,115,.07) 1px, transparent 1px) 0 0 / 22px 100%;
+}
+.marke { text-decoration: none; font-weight: 800; font-size: 1.25rem; line-height: 1.1; color: var(--blau); }
+.marke:hover { background: none; }
+.marke small { display: block; font-weight: 400; font-size: 0.8125rem; color: var(--leise); }
+/* ---------- Knöpfe ----------
+   Hauptknopf = Kreppband: leicht schräg aufgeklebt, hebt sich beim Darüberfahren an und richtet sich gerade.
+   Nebenknopf = blauer Rahmen: wird beim Darüberfahren hellblau hinterlegt. */
+.kopf-anruf, button[type="submit"] {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 18px;
+  font: 800 1rem var(--schrift); color: var(--blau-tief); text-decoration: none; white-space: nowrap; cursor: pointer;
+  background: var(--krepp); border: 0;
+  border-left: 2px dashed var(--krepp-rand); border-right: 2px dashed var(--krepp-rand);
+  box-shadow: var(--schatten-ruhe);
+  transform: rotate(-1.5deg);
+  transition: transform var(--weich), box-shadow var(--weich), background-color var(--weich);
+}
+.kopf-anruf:hover, button[type="submit"]:hover {
+  color: var(--blau-tief); background: #EDDF9C; box-shadow: var(--schatten-hoch);
+  transform: rotate(0deg) translateY(-2px);
+}
+.kopf-anruf:active, button[type="submit"]:active { transform: rotate(0deg) translateY(0); box-shadow: var(--schatten-ruhe); }
+
+/* ---------- Hauptmenü ----------
+   Handy: „Menü“-Knopf klappt die Liste unter der Kopfzeile auf.
+   Ab 960 px: Menü in der Kopfzeile, „Leistungen“ klappt eine Liste auf (per Klick). */
+.menue-knopf, .nav-klapp {
+  font: 700 1rem var(--schrift); color: var(--blau); background: none; border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; min-height: 46px; padding: 0 10px;
+}
+.menue-knopf { margin-left: auto; border: 2px solid var(--blau); padding: 0 14px; }
+/* Drei Striche – geöffnet werden sie zum Kreuz */
+.menue-knopf::before {
+  content: ""; width: 16px; height: 14px;
+  background:
+    linear-gradient(currentColor, currentColor) 0 0 / 100% 2px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 50% / 100% 2px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 100% / 100% 2px no-repeat;
+}
+.menue-knopf[aria-expanded="true"] { background: var(--blau); color: #fff; }
+.menue-knopf[aria-expanded="true"]::before {
+  background:
+    linear-gradient(45deg, transparent calc(50% - 1.2px), currentColor calc(50% - 1.2px) calc(50% + 1.2px), transparent calc(50% + 1.2px)),
+    linear-gradient(-45deg, transparent calc(50% - 1.2px), currentColor calc(50% - 1.2px) calc(50% + 1.2px), transparent calc(50% + 1.2px));
+}
+.nav-klapp::after { content: ""; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .15s; }
+.nav-klapp[aria-expanded="true"]::after { transform: translateY(2px) rotate(-135deg); }
+
+.hauptnav ul { list-style: none; margin: 0; padding: 0; }
+.hauptnav a { display: flex; align-items: center; min-height: 46px; padding: 0 10px; font-weight: 700; text-decoration: none; }
+.menue-knopf { transition: background-color var(--weich), color var(--weich); }
+.menue-knopf:hover { background: var(--blau-hell); }
+
+/* Schmale Handys: Kopfzeile muss in 360 px passen – „Jetzt anrufen“ wird zu „Anrufen“ */
+@media (max-width: 479px) {
+  .kopf { gap: 8px; padding: 0 16px; }
+  .marke { font-size: 1.125rem; }
+  .menue-knopf { padding: 0 10px; }
+  .kopf-anruf { padding: 0 12px; }
+  .kopf-anruf .nur-breit { display: none; }
+}
+@media (min-width: 480px) { .kopf-anruf .nur-schmal { display: none; } }
+/* Aufgeklappt: der Zettel „fällt“ leicht schräg herein */
+@keyframes zettel-rein {
+  from { opacity: 0; transform: translateY(-8px) rotate(var(--zettel-start, -3deg)); }
+  to { opacity: 1; transform: translateY(0) rotate(var(--zettel-dreh, 0deg)); }
+}
+.nav-liste-titel { display: none; }
+
+/* Leistungs-Einträge wie auf dem Auftragszettel: gezeichnetes Kästchen + Name.
+   Beim Darüberfahren wird das Kästchen mit Bleistift abgehakt und die Zeile mit Textmarker angestrichen;
+   die aktuelle Seite bleibt abgehakt. */
+:root {
+  --kaestchen: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3.2 4.1C7 3.6 12 3.8 16.4 3.4c.3 4.2.1 8.6.4 12.9-4.4.3-9.2 0-13.4.4-.3-4.2.1-8.5-.2-12.6z' fill='none' stroke='%231F3F73' stroke-opacity='.65' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --kaestchen-haken: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3.2 4.1C7 3.6 12 3.8 16.4 3.4c.3 4.2.1 8.6.4 12.9-4.4.3-9.2 0-13.4.4-.3-4.2.1-8.5-.2-12.6z' fill='none' stroke='%231F3F73' stroke-opacity='.65' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M5.6 10.3c1.5 1.2 2.5 2.6 3.4 4.3 2.5-4.8 5.5-8.8 10-12.8' fill='none' stroke='%23142B52' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.hauptnav .nav-liste a {
+  display: flex; align-items: center; justify-content: flex-start; gap: 10px; font-weight: 600;
+  background: linear-gradient(rgba(233,217,139,.85), rgba(233,217,139,.85)) no-repeat 46px 70% / 0 42%;
+  transition: background-size 260ms cubic-bezier(.3,.7,.2,1), color var(--weich);
+}
+.hauptnav .nav-liste a::before {
+  content: ""; flex: 0 0 20px; height: 20px; background: var(--kaestchen) no-repeat center / contain;
+  transition: transform var(--weich);
+}
+.hauptnav .nav-liste a:hover::before, .hauptnav .nav-liste a:focus-visible::before, .hauptnav .nav-liste a[aria-current="page"]::before {
+  background-image: var(--kaestchen-haken);
+}
+.hauptnav .nav-liste a:hover::before { transform: rotate(-4deg) scale(1.08); }
+.hauptnav .nav-liste a:hover, .hauptnav .nav-liste a:focus-visible, .hauptnav .nav-liste a[aria-current="page"] {
+  color: var(--blau-tief); background-size: calc(100% - 66px) 42%;
+}
+
+/* Handy: das Menü ist ein Zettel auf Karopapier, oben mit zwei Kreppstreifen angeklebt */
+@media (max-width: 959px) {
+  .hauptnav {
+    display: none; position: absolute; top: calc(100% + 6px); left: 10px; right: 10px; z-index: 19;
+    background: var(--karo), #fff; box-shadow: var(--schatten-hoch);
+    padding: 20px 18px 22px; max-height: calc(100vh - var(--kopf-h) - 20px); overflow-y: auto;
+    --zettel-dreh: -.4deg; transform: rotate(var(--zettel-dreh));
+  }
+  .hauptnav::before, .hauptnav::after {
+    content: ""; position: absolute; top: 0; width: 78px; height: 20px; background: var(--krepp); opacity: .95;
+    border-left: 1px dashed var(--krepp-rand); border-right: 1px dashed var(--krepp-rand);
+  }
+  .hauptnav::before { left: 14%; transform: rotate(-5deg); }
+  .hauptnav::after { right: 12%; transform: rotate(4deg); }
+  .menue-knopf[aria-expanded="true"] + .hauptnav { display: block; animation: zettel-rein 220ms cubic-bezier(.3,.7,.2,1); }
+  /* Bleistiftlinien statt grauer Trennstriche */
+  .hauptnav > ul > li { background: var(--bleistift) no-repeat 0 100% / 100% 5px; }
+  .hauptnav a, .nav-klapp { width: 100%; justify-content: space-between; font-size: 1.1875rem; min-height: 54px; padding: 0 6px; transition: background-color var(--weich); }
+  .hauptnav a:hover, .nav-klapp:hover { background: rgba(233,217,139,.35); }
+  .hauptnav a[aria-current="page"] { background: linear-gradient(var(--krepp), var(--krepp)) no-repeat 6px 70% / calc(100% - 12px) 35%; }
+  .nav-liste { display: none; padding: 0 0 10px 16px !important; margin-bottom: 6px !important; border-left: 3px solid var(--krepp); }
+  .nav-klapp[aria-expanded="true"] + .nav-liste { display: block; }
+  .nav-liste a { min-height: 48px; font-size: 1.0625rem; }
+  .nav-liste .linie { display: none; }
+  .hauptnav .nav-liste a { background-position: 32px 70%; }
+  .hauptnav .nav-liste a:hover, .hauptnav .nav-liste a[aria-current="page"] { background-size: calc(100% - 38px) 42%; }
+}
+@media (min-width: 960px) {
+  .menue-knopf { display: none; }
+  .hauptnav { margin-left: auto; }
+  .hauptnav > ul { display: flex; align-items: center; gap: 4px; }
+  /* Zollstock klappt beim Darüberfahren unter dem Wort aus */
+  .hauptnav > ul > li > a, .nav-klapp {
+    background-image: var(--zollstock-lang), var(--zollstock-kurz), var(--zollstock-band);
+    background-repeat: no-repeat;
+    background-position: 10px calc(100% - 6px);
+    background-size: 0 7px, 0 4px, 0 9px;
+    transition: background-size 260ms cubic-bezier(.3,.7,.2,1), color var(--weich);
+  }
+  .hauptnav > ul > li > a:hover, .nav-klapp:hover, .nav-klapp[aria-expanded="true"] {
+    background-size: calc(100% - 20px) 7px, calc(100% - 20px) 4px, calc(100% - 20px) 9px; color: var(--blau-tief);
+  }
+  /* Leistungen = Klemmbrett: dunkelblaue Platte, Metallklammer, Aufmaßzettel mit Karos */
+  .nav-leistungen { position: relative; }
+  .nav-liste {
+    display: none; position: absolute; top: calc(100% + 22px); left: -16px; min-width: 320px;
+    padding: 30px 0 16px !important;
+    background: var(--karo), #fff;
+    border: 10px solid var(--blau-tief); border-radius: 8px;
+    box-shadow: 0 16px 34px rgba(20,43,82,.3);
+    --zettel-dreh: -1deg; --zettel-start: -4deg; transform: rotate(var(--zettel-dreh)); transform-origin: 50% -20px;
+  }
+  .nav-klapp[aria-expanded="true"] + .nav-liste { display: block; animation: zettel-rein 240ms cubic-bezier(.3,.7,.2,1); }
+  /* Klammer */
+  .nav-liste::before {
+    content: ""; position: absolute; top: -24px; left: 50%; width: 84px; height: 28px; margin-left: -42px;
+    background: linear-gradient(#E3E7EC, #A5ADB7); border-radius: 6px 6px 12px 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -2px 0 rgba(0,0,0,.12);
+  }
+  /* Niete in der Klammer */
+  .nav-liste::after {
+    content: ""; position: absolute; top: -17px; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #C9CED6, #6E7682); box-shadow: 0 1px 1px rgba(0,0,0,.4);
+  }
+  /* Überschrift auf dem Zettel, mit Bleistift unterstrichen */
+  .nav-liste-titel {
+    display: block; margin: 0 20px 6px; padding-bottom: 6px;
+    font-size: .8125rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--leise);
+    background: var(--bleistift) no-repeat 0 100% / 100% 5px;
+  }
+  /* Einträge wie im Leistungsverzeichnis: ☐ 01 Badsanierung ········ → */
+  .nav-liste a { padding: 0 20px; white-space: nowrap; }
+  .nav-liste .linie { flex: 1 1 24px; min-width: 24px; align-self: center; margin-top: 8px; border-bottom: 2px dotted rgba(31,63,115,.3); }
+  .nav-liste a::after {
+    content: ""; flex: 0 0 22px; height: 12px; background: var(--pfeil) no-repeat center / contain;
+    opacity: .55; transition: transform var(--weich), opacity var(--weich);
+  }
+  .nav-liste a:hover::after, .nav-liste a:focus-visible::after { opacity: 1; transform: translateX(4px) rotate(-3deg); }
+  .kopf-anruf { margin-left: 12px; }
+}
+
+/* ---------- Abschnitte klar trennen ----------
+   Jeder Abschnitt hat eine eigene Wandfarbe. Über jede Grenze klebt ein Kreppstreifen. */
+main > section { position: relative; padding: 64px var(--rand); }
+main > section + section::before {
+  content: ""; position: absolute; top: -12px; left: 12%; z-index: 2;
+  width: 96px; height: 24px; background: var(--krepp); opacity: .95;
+  border-left: 1px dashed var(--krepp-rand); border-right: 1px dashed var(--krepp-rand);
+  transform: rotate(-4deg);
+}
+main > section:nth-of-type(3)::before { left: auto; right: 14%; transform: rotate(5deg); width: 80px; }
+main > section:nth-of-type(4)::before { left: 40%; transform: rotate(-2deg); width: 110px; }
+main > section:nth-of-type(5)::before { left: 8%; transform: rotate(3deg); }
+main > section:nth-of-type(6)::before { left: auto; right: 22%; transform: rotate(-6deg); width: 70px; }
+main > section:nth-of-type(7)::before { left: 30%; transform: rotate(2deg); }
+
+.anfang { background: var(--wand); }
+.baustellen { background: var(--blau-hell); }
+.stimmen { background: var(--rigips); }
+.ich { background: var(--blau); color: #fff; }
+.leistungen { background: var(--wand); }
+.orte { background: var(--krepp-hell); }
+.kontakt { background: var(--blau-tief); color: #fff; }
+.ich h2, .kontakt h2 { color: #fff; }
+.ich a, .kontakt a { color: #fff; }
+.ich a:hover, .kontakt a:hover { color: #fff; }
+/* Auf dunkelblauem Grund: Bleistift und Pfeil in Weiß */
+.ich, .kontakt {
+  --bleistift: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5.4C12 4.2 22 6 34 4.9S58 3.7 70 5.1 88 5.8 99 4.4' fill='none' stroke='%23ffffff' stroke-opacity='.75' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --pfeil: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 14'%3E%3Cpath d='M1.5 7.6C8 6.8 15 7.4 23.2 6.9M17.8 2.2c2 1.7 3.6 3.1 5.6 4.7-2.1 1.4-3.8 2.9-5.4 4.8' fill='none' stroke='%23E9D98B' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* ---------- Anfang ---------- */
+.anfang { padding-top: 32px; }
+.pinnwand { position: relative; height: 340px; margin: 0 -4px 36px; }
+.pinnwand img { position: absolute; border: 6px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.18); object-fit: cover; }
+.p1 { width: 52%; height: 320px; left: 0; top: 0; transform: rotate(-2.2deg); }
+.p2 { width: 50%; aspect-ratio: 1; right: 0; top: 18px; transform: rotate(3.1deg); }
+.p3 { width: 44%; aspect-ratio: 1; right: 9%; top: 188px; transform: rotate(-0.8deg); }
+.pinnwand::before, .pinnwand::after, .anfang::after {
+  content: ""; position: absolute; height: 22px; background: var(--krepp); opacity: .92; z-index: 3;
+  border-left: 1px dashed var(--krepp-rand); border-right: 1px dashed var(--krepp-rand);
+}
+.pinnwand::before { width: 74px; left: 14%; top: -8px; transform: rotate(-7deg); }
+.pinnwand::after { width: 58px; right: 16%; top: 6px; transform: rotate(9deg); }
+.anfang::after { width: 66px; right: calc(var(--rand) + 18%); top: 214px; transform: rotate(-4deg); }
+h1 { font-size: 2.125rem; margin-bottom: 18px; max-width: 20ch; }
+.ruf { font-size: 1.125rem; margin: 26px 0 14px; }
+/* Telefonnummer mit Textmarker: beim Darüberfahren füllt der Marker die ganze Zeile */
+.ruf a {
+  font-size: 2.25rem; font-weight: 800; text-decoration: none;
+  background: linear-gradient(var(--krepp), var(--krepp)) no-repeat 0 100% / 100% 38%;
+  transition: background-size var(--weich);
+}
+.ruf a:hover { background-size: 100% 100%; }
+
+/* ---------- Baustellen ---------- */
+.bau { margin-top: 44px; }
+.reihe {
+  list-style: none; padding: 8px var(--rand) 14px; margin: 10px calc(var(--rand) * -1) 0;
+  display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
+  scrollbar-width: thin; scrollbar-color: var(--krepp-rand) transparent;
+}
+.reihe li { flex: 0 0 78%; scroll-snap-align: center; }
+.reihe img {
+  width: 100%; aspect-ratio: 1; object-fit: cover; background: #ddd; border: 5px solid #fff;
+  box-shadow: var(--schatten-ruhe); transition: transform var(--weich), box-shadow var(--weich);
+}
+.reihe-rahmen { position: relative; }
+
+/* Striche unter der Fotoreihe: ein Bleistiftstrich pro Foto, das sichtbare Foto = Stück Kreppband.
+   Ersetzt die Scrollleiste; nur sichtbar, wenn es etwas zu blättern gibt. */
+.reihe-striche { display: none; justify-content: center; align-items: center; gap: 2px; margin-top: 2px; }
+.reihe-rahmen.blaetterbar .reihe-striche { display: flex; }
+.reihe-rahmen.blaetterbar .reihe { scrollbar-width: none; }
+.reihe-rahmen.blaetterbar .reihe::-webkit-scrollbar { display: none; }
+.reihe-striche button {
+  width: 38px; height: 36px; padding: 0; border: 0; background: none; cursor: pointer;
+  display: grid; place-items: center;
+}
+.reihe-striche {
+  /* kräftigerer Bleistift als bei den Links, damit die Striche gut zu sehen sind */
+  --bleistift-strich: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5C20 3.6 40 5.6 60 4.2S88 4.8 98 3.6' fill='none' stroke='%231F3F73' stroke-opacity='.75' stroke-width='3' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+.reihe-striche button::before {
+  content: ""; width: 24px; height: 8px;
+  background: var(--bleistift-strich) no-repeat center / 100% 100%;
+  transform: rotate(var(--strich-dreh, -4deg));
+  transition: width var(--weich), height var(--weich), transform var(--weich);
+}
+.reihe-striche button:nth-child(3n+2) { --strich-dreh: 3deg; }
+.reihe-striche button:nth-child(3n) { --strich-dreh: -1deg; }
+.reihe-striche button:hover::before { width: 30px; }
+.reihe-striche button.aktiv::before {
+  width: 36px; height: 14px; background: var(--krepp);
+  border-left: 1px dashed var(--krepp-rand); border-right: 1px dashed var(--krepp-rand);
+  box-shadow: 0 1px 1px rgba(0,0,0,.12);
+}
+.reihe span { display: block; font-size: 0.9375rem; color: var(--leise); padding-top: 6px; }
+.reihe-klein li { flex-basis: 46%; }
+.nachwort { margin-top: 52px; }
+
+/* ---------- Bewertungen ---------- */
+.bilanz { display: grid; gap: 6px 24px; margin: 8px 0 34px; }
+.bilanz-note { margin: 0; display: flex; align-items: baseline; gap: 14px; }
+.bilanz-note b { font-size: 4.5rem; line-height: 1; color: var(--blau); }
+.sterne { color: var(--blau); letter-spacing: 2px; font-size: 1.5rem; }
+.bilanz-text { margin: 4px 0 12px; }
+.verteilung { list-style: none; margin: 0; padding: 0; max-width: 26rem; }
+.verteilung li { display: grid; grid-template-columns: 5.2em 1fr 2em; align-items: center; gap: 10px; font-size: 0.9375rem; padding: 2px 0; }
+.verteilung i { height: 12px; background: linear-gradient(var(--blau), var(--blau)) no-repeat 0 0 / var(--anteil) 100%, #fff; }
+.verteilung b { text-align: right; font-weight: 700; }
+
+.filter {
+  display: flex; gap: 8px; overflow-x: auto; margin: 0 calc(var(--rand) * -1) 26px; padding: 6px var(--rand) 10px;
+  scrollbar-width: thin; scrollbar-color: var(--krepp-rand) transparent;
+}
+/* Nebenknöpfe: blauer Rahmen, beim Darüberfahren hellblau und leicht angehoben */
+.filter button, .mehr {
+  flex: 0 0 auto; min-height: 46px; padding: 0 16px; cursor: pointer;
+  font: 700 1rem var(--schrift); color: var(--blau); background: #fff; border: 2px solid var(--blau);
+  transition: background-color var(--weich), color var(--weich), transform var(--weich), box-shadow var(--weich);
+}
+.filter button:hover, .mehr:hover { background: var(--blau-hell); transform: translateY(-2px); box-shadow: var(--schatten-ruhe); }
+.filter button:active, .mehr:active { transform: translateY(0); box-shadow: none; }
+/* Gewählter Filter: blau, mit kleinem Kreppstreifen oben */
+.filter button[aria-pressed="true"] { position: relative; background: var(--blau); color: #fff; }
+.filter button[aria-pressed="true"]::after {
+  content: ""; position: absolute; top: -6px; left: calc(50% - 16px); width: 32px; height: 12px;
+  background: var(--krepp); transform: rotate(-4deg);
+}
+
+/* Zettel: mit Krepp an die Wand geklebt, jeder etwas anders */
+.zettelwand { display: grid; gap: 30px; padding-top: 12px; }
+.zettel {
+  position: relative; margin: 0; padding: 24px 20px 18px; background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,.12), 0 6px 14px -8px rgba(0,0,0,.25);
+  transform: rotate(var(--dreh, 0deg)); break-inside: avoid;
+  transition: transform var(--weich), box-shadow var(--weich);
+}
+.zettel::before {
+  content: ""; position: absolute; top: -11px; left: var(--krepp-x, 40%); width: 70px; height: 22px;
+  background: var(--krepp); opacity: .92; transform: rotate(var(--krepp-dreh, -3deg));
+}
+.zettel .z-sterne { color: var(--blau); letter-spacing: 1px; margin: 0 0 8px; font-size: 1.0625rem; }
+.zettel .z-sterne .leer { color: #C3C8D0; }
+.zettel .z-arbeit { font-size: 0.9375rem; font-weight: 700; color: var(--blau); margin: 0 0 8px; }
+.zettel p.z-text { margin: 0 0 12px; }
+.zettel footer { font-size: 0.9375rem; color: var(--leise); }
+.zettel .z-antwort { margin: 12px 0 0; padding-top: 10px; border-top: 1px dashed var(--strich); font-size: 0.9375rem; }
+.zettel .z-antwort b { color: var(--blau); }
+.zettel.lang p.z-text { font-size: 1.1875rem; }
+.mehr { margin-top: 30px; min-height: 52px; padding: 0 24px; font-size: 1.0625rem; }
+.mehr[hidden] { display: none; }
+
+.ehrlich { margin-top: 52px; padding: 26px 22px; background: var(--krepp-hell); transform: rotate(-0.6deg); position: relative; }
+.ehrlich::before { content: ""; position: absolute; top: -11px; left: 38%; width: 80px; height: 22px; background: var(--krepp); transform: rotate(3deg); }
+
+/* ---------- Über uns ---------- */
+.ich-bild { width: 78%; max-width: 320px; margin-bottom: 26px; border: 6px solid #fff; transform: rotate(1.4deg); }
+.unterschrift { font-style: italic; font-size: 1.375rem; margin-top: 18px; }
+
+/* ---------- Leistungen ---------- */
+.leistungen dl { margin: 18px 0 0; }
+.leistungen dt { font-weight: 700; font-size: 1.1875rem; color: var(--blau); padding-top: 16px; }
+.leistungen dd { margin: 4px 0 0; padding-bottom: 16px; border-bottom: 1px solid var(--strich); max-width: 60ch; }
+
+/* ---------- Orte / Karte ---------- */
+.karte { margin: 24px calc(var(--rand) * -1) 0; padding: 0 var(--rand); overflow-x: auto; }
+.karte-svg { display: block; min-width: 620px; width: 100%; height: auto; background: #fff; border: 5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.ring { fill: none; stroke: var(--blau); stroke-opacity: .35; stroke-width: 1.2; stroke-dasharray: 5 5; }
+.ring-km { font: 400 11px var(--schrift); fill: var(--leise); }
+.ort circle { fill: var(--blau); fill-opacity: .85; }
+.ort text { font: 400 12px var(--schrift); fill: var(--text); paint-order: stroke; stroke: #fff; stroke-width: 3px; }
+.ort-heim circle { fill: var(--krepp); stroke: var(--blau); stroke-width: 2.5; fill-opacity: 1; }
+.ort-heim text { font-weight: 800; font-size: 15px; fill: var(--blau); }
+.karte-hinweis { font-size: 0.875rem; color: var(--leise); margin: 8px 0 0; }
+.zonen { display: grid; gap: 22px; margin-top: 34px; }
+.zone h3 small { display: block; font-size: 0.9375rem; font-weight: 400; color: var(--leise); margin-top: 2px; }
+.zone p { margin: 0; }
+
+/* ---------- Kontakt ---------- */
+.kontakt { padding-bottom: 72px; }
+.kontakt .ruf a { color: #fff; background-image: linear-gradient(rgba(233,217,139,.45), rgba(233,217,139,.45)); }
+form { display: grid; gap: 6px; max-width: 32rem; margin-top: 24px; }
+label { font-weight: 700; margin-top: 12px; }
+input, textarea {
+  font: inherit; font-size: 1.125rem; color: var(--text);
+  border: 2px solid transparent; border-radius: 0; padding: 12px; min-height: 52px; background: #fff;
+}
+input:focus, textarea:focus { outline: none; border-color: var(--krepp); box-shadow: 0 0 0 3px var(--krepp); }
+.haken { display: grid; grid-template-columns: 26px 1fr; gap: 10px; font-weight: 400; font-size: 1rem; align-items: start; }
+.haken input { min-height: 0; width: 24px; height: 24px; margin: 2px 0 0; accent-color: var(--krepp); }
+button[type="submit"] { margin-top: 18px; justify-self: start; min-height: 54px; padding: 0 28px; font-size: 1.125rem; }
+
+
+/* =========================================================
+   ab 600 px
+   ========================================================= */
+@media (min-width: 600px) {
+  :root { --rand: 36px; }
+  h1 { font-size: 2.75rem; }
+  h2 { font-size: 2.5rem; }
+  main > section { padding-top: 80px; padding-bottom: 80px; }
+  .pinnwand { height: 460px; max-width: 620px; }
+  .p1 { height: 440px; width: 48%; }
+  .p3 { top: 250px; }
+  .anfang::after { top: 274px; }
+  .reihe li { flex-basis: 44%; }
+  .reihe-klein li { flex-basis: 30%; }
+  .zettelwand { display: block; columns: 2; column-gap: 28px; }
+  .zettel { margin-bottom: 34px; display: inline-block; width: 100%; }
+  .bilanz { grid-template-columns: auto 1fr; align-items: center; }
+  .bilanz-note { grid-row: span 2; flex-direction: column; gap: 4px; }
+  .karte-svg { min-width: 0; }
+  .karte-hinweis { display: none; }
+  .zonen { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* =========================================================
+   ab 960 px
+   ========================================================= */
+@media (min-width: 960px) {
+  :root { --rand: max(56px, calc((100vw - 1180px) / 2)); --kopf-h: 72px; }
+  main > section { padding-top: 104px; padding-bottom: 104px; }
+  .anfang { display: grid; grid-template-columns: 1.1fr 1fr; gap: 64px; align-items: center; padding-top: 56px; }
+  .anfang::after { right: auto; left: calc(var(--rand) + 30%); top: 300px; }
+  .pinnwand { margin: 0; height: 560px; max-width: none; }
+  .p1 { height: 540px; }
+  .p3 { top: 300px; }
+  h1 { font-size: 3.25rem; }
+
+  .baustellen { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; }
+  .baustellen > h2, .baustellen > .vorwort { grid-column: 1 / 8; }
+  .bau { grid-column: 1 / 11; }
+  .bau-rechts { grid-column: 3 / 13; }
+  .nachwort, .reihe-klein, .baustellen > .reihe-rahmen, .baustellen > .reihe { grid-column: 1 / 13; }
+  .reihe { overflow: visible; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .reihe li:nth-child(2n) { margin-top: 26px; }
+  .bau .reihe:has(li:nth-child(4):last-child) { grid-template-columns: repeat(4, 1fr); }
+
+  .zettelwand { columns: 3; column-gap: 32px; }
+  .ehrlich { max-width: 760px; margin-left: 12%; }
+
+  .ich { display: grid; grid-template-columns: 340px 1fr; gap: 64px; align-items: start; }
+  .leistungen dl { display: grid; grid-template-columns: 240px 1fr; }
+  .leistungen dt { padding: 16px 0; border-bottom: 1px solid var(--strich); }
+  .leistungen dd { padding-top: 16px; margin: 0; }
+  .orte { display: grid; grid-template-columns: 1fr 1.6fr; column-gap: 56px; align-items: start; }
+  .orte > h2, .orte > .vorwort { grid-column: 1; }
+  .karte { grid-column: 2; grid-row: 1 / 4; margin: 0; padding: 0; }
+  .zonen { grid-column: 1 / 3; }
+  .kontakt { display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; }
+  .kontakt > form { grid-column: 2; grid-row: 1 / 6; margin-top: 0; }
+}
+
+/* ---------- Unterseiten (Leistungen, Projekte) ---------- */
+.zettel[hidden] { display: none; }
+.bau-link { color: inherit; }
+.weitere { margin-top: 20px; color: var(--leise); }
+.leistungen dt a { color: inherit; }
+
+.brotkrumen { padding: 14px var(--rand) 0; font-size: 0.9375rem; color: var(--leise); }
+.brotkrumen a, .brotkrumen span { display: inline-flex; align-items: center; min-height: 44px; }
+.brotkrumen a { color: var(--leise); font-weight: 600; }
+.brotkrumen a:hover { color: var(--blau); }
+.brotkrumen a + a::before, .brotkrumen a + span::before { content: "›"; margin: 0 8px; color: var(--leise); }
+
+.unterseite-kopf { padding-top: 24px; }
+.unterseite-kopf h1 { margin-bottom: 22px; }
+.ort-zusatz { display: block; font-size: 1.125rem; font-weight: 400; color: var(--leise); margin-top: 8px; }
+
+.haekchen { list-style: none; padding: 0; margin: 18px 0 0; max-width: 60ch; }
+.haekchen li { position: relative; padding: 12px 0 12px 34px; border-bottom: 1px solid var(--strich); }
+.haekchen li::before {
+  content: ""; position: absolute; left: 4px; top: 18px; width: 14px; height: 8px;
+  border-left: 3px solid var(--blau); border-bottom: 3px solid var(--blau); transform: rotate(-45deg);
+}
+
+.projekt-liste { background: var(--krepp-hell); }
+.projekt-liste ul { list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.projekt-liste a { display: block; text-decoration: none; color: var(--blau); font-weight: 700; }
+.projekt-liste a:hover { background: none; }
+.projekt-liste img { width: 100%; aspect-ratio: 1; object-fit: cover; border: 5px solid #fff; }
+.projekt-liste span { display: block; padding-top: 8px; line-height: 1.3; }
+.projekt-liste small { display: block; font-weight: 400; color: var(--leise); }
+
+.fragen { background: var(--wand); }
+.fragen details { max-width: 60ch; border-bottom: 1px solid var(--strich); }
+.fragen summary { cursor: pointer; font-weight: 700; color: var(--blau); padding: 16px 0; min-height: 44px; }
+.fragen details p { margin: 0 0 16px; }
+
+.andere-titel { color: #fff; margin-top: 36px; }
+.andere { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+.andere a { display: inline-flex; min-height: 44px; align-items: center; }
+
+.bildfolge { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 22px; counter-reset: schritt; }
+.bildfolge figure { margin: 0; }
+.bildfolge img { width: 100%; border: 6px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.bildfolge figcaption { padding-top: 8px; color: var(--leise); }
+.bildfolge figcaption::before { counter-increment: schritt; content: counter(schritt) ". "; font-weight: 800; color: var(--blau); }
+
+@media (min-width: 600px) {
+  .projekt-liste ul { grid-template-columns: repeat(3, 1fr); }
+  .bildfolge { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 960px) {
+  .unterseite-kopf { max-width: 900px; }
+  .projekt-liste ul { grid-template-columns: repeat(4, 1fr); }
+  .baustellen.projekt-bilder { display: block; }
+  .kontakt .andere-titel, .kontakt .andere { grid-column: 1; }
+}
+
+/* ---------- Darüberfahren: Fotos und Zettel heben sich leicht von der Wand ab ----------
+   Nur für Geräte mit Maus/Touchpad – auf dem Handy würde der Effekt nach dem Antippen „kleben“. */
+.projekt-liste img, .bildfolge img, .ich-bild { transition: transform var(--weich), box-shadow var(--weich); }
+.projekt-liste span { transition: color var(--weich); }
+@media (hover: hover) and (pointer: fine) {
+  .reihe li:hover img { transform: translateY(-4px) rotate(-.8deg); box-shadow: var(--schatten-hoch); }
+  .reihe li:nth-child(2n):hover img { transform: translateY(-4px) rotate(.8deg); }
+  .zettel:hover { transform: rotate(0deg) translateY(-4px); box-shadow: var(--schatten-hoch); z-index: 1; }
+  .projekt-liste a:hover img { transform: translateY(-4px) rotate(-.8deg); box-shadow: var(--schatten-hoch); }
+  .projekt-liste a:hover span { color: var(--blau-tief); text-decoration: underline 3px var(--krepp-rand); text-underline-offset: 4px; }
+  .bildfolge figure:hover img { transform: translateY(-3px); box-shadow: var(--schatten-hoch); }
+}
+
+/* Wer in den Systemeinstellungen „Bewegung reduzieren“ gewählt hat, bekommt keine Animationen */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; animation: none !important; }
+}
+
+/* ---------- Karte: Sammelbeschriftung Raum Flensburg ---------- */
+.umgebung { font: 400 11px var(--schrift); fill: var(--leise); paint-order: stroke; stroke: #fff; stroke-width: 3px; }
+
+/* ---------- Footer: Bauschild ---------- */
+.fuss { background: var(--rigips); padding: 64px var(--rand) 32px; position: relative; color: var(--text); }
+.fuss::before {
+  content: ""; position: absolute; top: -12px; right: 18%; width: 90px; height: 24px;
+  background: var(--krepp); transform: rotate(4deg);
+  border-left: 1px dashed var(--krepp-rand); border-right: 1px dashed var(--krepp-rand);
+}
+.bauschild {
+  position: relative; max-width: 640px; background: #fff; border: 6px solid var(--blau);
+  padding: 26px 22px 22px;
+}
+/* Schrauben in den Ecken */
+.bauschild::before, .bauschild::after {
+  content: ""; position: absolute; top: 8px; width: 10px; height: 10px; border-radius: 50%;
+  background: #B9BEC6; box-shadow: inset 0 0 0 2px #8D939C;
+}
+.bauschild::before { left: 8px; } .bauschild::after { right: 8px; }
+.bauschild-kopf { margin: 0; font-size: 1rem; color: var(--leise); }
+.bauschild-firma { margin: 0 0 18px; font-size: 2rem; font-weight: 800; color: var(--blau); line-height: 1.1; }
+.bauschild dl { margin: 0; border-top: 2px solid var(--blau); }
+.bauschild dl div { display: grid; grid-template-columns: 1fr; padding: 10px 0; border-bottom: 1px solid var(--strich); }
+.bauschild dt { font-size: 0.9375rem; color: var(--leise); }
+.bauschild dd { margin: 0; font-weight: 700; }
+
+/* ---------- Footer: Ordnung ----------
+   Oben: Bauschild | Leistungen | Weiteres.  Unten (hinter einem Maßband): © · Impressum/Datenschutz · Nach oben */
+.fuss-oben { display: grid; gap: 36px; }
+.fuss-spalte ul { list-style: none; margin: 0; padding: 0; }
+.fuss-titel {
+  margin: 0 0 8px; padding-bottom: 8px; max-width: none;
+  font-size: .8125rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--leise);
+  background: var(--bleistift) no-repeat 0 100% / 100% 5px;
+}
+/* Footer-Links: schlicht, beim Darüberfahren klappt der Zollstock aus */
+.fuss-link {
+  display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; color: var(--blau);
+  background-image: var(--zollstock-lang), var(--zollstock-kurz), var(--zollstock-band);
+  background-repeat: no-repeat; background-position: 0 calc(100% - 8px);
+  background-size: 0 7px, 0 4px, 0 9px;
+  transition: background-size 260ms cubic-bezier(.3,.7,.2,1), color var(--weich);
+}
+.fuss-link:hover { color: var(--blau-tief); background-size: 100% 7px, 100% 4px, 100% 9px; }
+
+.fuss-unten {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 24px;
+  margin-top: 44px; padding-top: 14px; font-size: .9375rem; color: var(--leise);
+  /* Maßband als Trennlinie – wie unter der Kopfzeile */
+  background:
+    repeating-linear-gradient(90deg, rgba(20,43,82,.38) 0 1px, transparent 1px 50px) 0 0 / 100% 9px no-repeat,
+    repeating-linear-gradient(90deg, rgba(20,43,82,.2) 0 1px, transparent 1px 10px) 0 0 / 100% 5px no-repeat,
+    linear-gradient(rgba(20,43,82,.3), rgba(20,43,82,.3)) 0 0 / 100% 1px no-repeat;
+}
+.fuss-unten p { margin: 0; }
+.fuss-recht { display: flex; gap: 20px; }
+.fuss-unten .fuss-link { font-weight: 600; }
+.nach-oben::after { content: "↑"; margin-left: 6px; transition: transform var(--weich); }
+.nach-oben:hover::after { transform: translateY(-3px); }
+
+@media (min-width: 600px) {
+  .bauschild { padding: 32px 36px 28px; transform: rotate(-0.4deg); }
+  .bauschild-firma { font-size: 2.5rem; }
+  .bauschild dl div { grid-template-columns: 9.5rem 1fr; gap: 16px; }
+  .fuss-oben { grid-template-columns: 1fr 1fr; }
+  .fuss-oben .bauschild { grid-column: 1 / -1; }
+}
+@media (min-width: 960px) {
+  .fuss { padding-top: 88px; }
+  .fuss-oben { grid-template-columns: minmax(0, 560px) 1fr 1fr; gap: 56px; align-items: start; }
+  .fuss-oben .bauschild { grid-column: auto; }
+  .fuss-spalte { padding-top: 8px; }
+}

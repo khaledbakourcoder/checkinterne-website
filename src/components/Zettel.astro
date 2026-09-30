@@ -1,0 +1,18 @@
+---
+// Eine Bewertung als „Zettel mit Krepp“. Drehung wird per CSS-Variable gesetzt (Filter-Skript passt sie an).
+interface Props {
+  b: { wer: string; wann: string; sterne: number; arbeit: string; text: string; antwort: string; hervorheben: boolean; leistungen: string[] };
+  i: number;
+}
+const { b, i } = Astro.props;
+const dreh = [-1.2, 0.8, -0.4, 1.5, -0.9, 0.3, 1.1, -1.6, 0.6, -0.2];
+const kreppX = ['38%', '12%', '62%', '30%', '52%', '20%'];
+const stil = `--dreh:${dreh[i % dreh.length]}deg;--krepp-x:${kreppX[i % kreppX.length]};--krepp-dreh:${i % 2 ? 4 : -3}deg`;
+---
+<blockquote class:list={['zettel', { lang: b.hervorheben }]} style={stil} data-leistungen={b.leistungen.join(' ')}>
+  <p class="z-sterne" aria-label={`${b.sterne} von 5 Sternen`}>{'★'.repeat(b.sterne)}<span class="leer">{'★'.repeat(5 - b.sterne)}</span></p>
+  <p class="z-arbeit">{b.arbeit}</p>
+  <p class="z-text">„{b.text}“</p>
+  <footer>{b.wer} · {b.wann}</footer>
+  {b.antwort && <p class="z-antwort"><b>Unsere Antwort:</b> {b.antwort}</p>}
+</blockquote>

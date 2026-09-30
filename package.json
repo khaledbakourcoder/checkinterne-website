@@ -1,0 +1,15 @@
+{
+  "name": "checkinterne-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "cms": "node cms/dev-server.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.3.5",
+    "sharp": "^0.35.5"
+  }
+}

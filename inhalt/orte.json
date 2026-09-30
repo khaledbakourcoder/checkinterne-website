@@ -1,0 +1,9 @@
+{
+  "ueberschrift": "Wo wir schon gearbeitet haben",
+  "vorwort": "Jeder Punkt ist ein Ort, aus dem eine Bewertung kommt – je größer der Punkt, desto mehr Aufträge. Die Kreise zeigen die Entfernung von Flensburg.",
+  "zonen": [
+    { "titel": "Um die Ecke", "entfernung": "bis 25 km", "orte": "Flensburg, Harrislee, Glücksburg, Handewitt, Wanderup, Schafflund" },
+    { "titel": "In der Region", "entfernung": "25 bis 50 km", "orte": "Kappeln, Hasselberg, Scheggerott, Boren, Leck, Husum, Hütten, Stapel" },
+    { "titel": "Für größere Aufträge", "entfernung": "weiter weg", "orte": "Gettorf, Osterrönfeld, Kiel, Sylt, Sankt Peter-Ording, Neumünster, Grömitz" }
+  ]
+}

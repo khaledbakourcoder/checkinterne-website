@@ -1,0 +1,58 @@
+---
+import Seite from '../../layouts/Seite.astro';
+import Bild from '../../components/Bild.astro';
+import { einstellungen as e, projekte, leistungen, url, telLink, whatsappLink, type Projekt } from '../../lib/inhalt';
+
+export function getStaticPaths() {
+  return projekte.map((p) => ({ params: { projekt: p.id }, props: { p } }));
+}
+const { p } = Astro.props as { p: Projekt };
+
+const ortZusatz = p.ort ? ` in ${p.ort}` : '';
+const titel = p.seoTitel || `${p.titel}${ortZusatz} – ${e.firma}`;
+const beschreibung = p.seoBeschreibung || p.absaetze.join(' ').slice(0, 155);
+const zugehoerig = leistungen.filter((l) => p.leistungen.includes(l.id));
+const basis = e.domain.replace(/\/$/, '');
+---
+<Seite
+  titel={titel}
+  beschreibung={beschreibung}
+  ogBild={p.bilder[p.bilder.length - 1].datei}
+  brotkrumen={[{ name: 'Baustellen', pfad: '/#baustellen' }, { name: p.titel, pfad: url.projekt(p.id) }]}
+  jsonLd={[{
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: p.titel,
+    description: beschreibung,
+    author: { '@id': basis + '/#firma' },
+    publisher: { '@id': basis + '/#firma' },
+  }]}
+>
+  <section class="unterseite-kopf">
+    <h1>{p.titel}{p.ort && <small class="ort-zusatz">{p.ort}</small>}</h1>
+    {p.absaetze.map((a) => <p>{a}</p>)}
+    {zugehoerig.length > 0 && (
+      <p class="klein">Gehört zu: {zugehoerig.map((l, i) => <>{i > 0 && ', '}<a href={url.leistung(l.id)}>{l.name}</a></>)}</p>
+    )}
+  </section>
+
+  <section class="baustellen projekt-bilder">
+    <h2>Von Anfang bis Ende</h2>
+    <ol class="bildfolge">
+      {p.bilder.map((b) => (
+        <li>
+          <figure>
+            <Bild datei={b.datei} alt={b.alt} breite={1100} sizes="(min-width: 960px) 45vw, 100vw" />
+            {b.beschriftung && <figcaption>{b.beschriftung}</figcaption>}
+          </figure>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="kontakt">
+    <h2>So etwas bei Ihnen?</h2>
+    <p>Schicken Sie ein paar Fotos per <a href={whatsappLink()}>WhatsApp</a> oder rufen Sie an.</p>
+    <p class="ruf"><a href={telLink()}>{e.telefonAnzeige}</a></p>
+  </section>
+</Seite>

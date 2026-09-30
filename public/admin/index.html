@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Website bearbeiten – Checkinterne</title>
+  <link rel="stylesheet" href="admin.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <nav class="seitenleiste" aria-label="Bereiche">
+    <a class="marke" href="#/">Checkinterne<small>Website bearbeiten</small></a>
+    <ul id="navigation">
+      <li><a href="#/" data-bereich="">Übersicht</a></li>
+      <li><a href="#/projekte" data-bereich="projekt">Baustellen</a></li>
+      <li><a href="#/leistungen" data-bereich="leistung">Leistungen</a></li>
+      <li class="trenner"><a href="#/seite/startseite" data-bereich="seite/startseite">Startseite</a></li>
+      <li><a href="#/seite/ueber-uns" data-bereich="seite/ueber-uns">Über uns</a></li>
+      <li><a href="#/seite/orte" data-bereich="seite/orte">Einsatzgebiet</a></li>
+      <li><a href="#/seite/einstellungen" data-bereich="seite/einstellungen">Kontaktdaten</a></li>
+      <li class="trenner" id="nav-verlauf" hidden><a href="#/verlauf" data-bereich="verlauf">Verlauf</a></li>
+    </ul>
+    <p class="nutzer" id="nutzer"></p>
+  </nav>
+  <div class="hauptbereich">
+    <div class="status" id="status" hidden></div>
+    <main id="app" tabindex="-1">
+      <p class="laden">Wird geladen …</p>
+    </main>
+  </div>
+  <div class="meldung" id="meldung" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

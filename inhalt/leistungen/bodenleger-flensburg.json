@@ -1,0 +1,28 @@
+{
+  "name": "Bodenverlegung",
+  "kurzname": "Böden",
+  "kurz": "Estrich, Ausgleichsmasse, Vinyl, Laminat, Parkett, Naturstein",
+  "ueberschrift": "Bodenleger in Flensburg und Umgebung",
+  "einleitung": [
+    "Ein neuer Boden ist nur so gut wie das, was darunter liegt. Deshalb machen wir den Untergrund zuerst eben – mit Estrich oder Ausgleichsmasse – und verlegen dann Vinyl, Laminat, Parkett oder Naturstein.",
+    "Übergangsleisten und Sockelleisten gehören für uns dazu."
+  ],
+  "leistungsliste": [
+    "Estrich und Ausgleichsmasse",
+    "Klick-Vinyl und Laminat",
+    "Parkett, auch abschleifen",
+    "Naturstein",
+    "Übergangs- und Sockelleisten"
+  ],
+  "fragen": [
+    { "frage": "Mein Boden ist sehr uneben – geht das trotzdem?", "antwort": "Ja. Wir gleichen den Untergrund vorher aus. Eine Kundin aus Wanderup schrieb, dass der Boden trotz sehr schwierigem Untergrund absolut eben geworden ist." }
+  ],
+  "bilder": [
+    { "datei": "boden-grossformat.jpg", "beschriftung": "Großformatige Bodenfliesen", "alt": "Leerer Raum mit neu verlegten großformatigen Bodenfliesen" },
+    { "datei": "boden-schleifen.jpg", "beschriftung": "Parkett schleifen", "alt": "Handwerker schleift Parkettboden mit einer Maschine" }
+  ],
+  "reihenfolge": 5,
+  "seoTitel": "Bodenleger in Flensburg – Checkinterne GmbH",
+  "seoBeschreibung": "Vinyl, Laminat, Parkett und Naturstein in Flensburg und Umgebung – mit ebenem Untergrund durch Estrich oder Ausgleichsmasse.",
+  "entwurf": true
+}

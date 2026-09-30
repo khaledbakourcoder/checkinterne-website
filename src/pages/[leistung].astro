@@ -1,0 +1,101 @@
+---
+import Seite from '../layouts/Seite.astro';
+import Bild from '../components/Bild.astro';
+import Zettel from '../components/Zettel.astro';
+import { einstellungen as e, leistungen, bewertungenZu, projekteZu, url, telLink, whatsappLink, type Leistung } from '../lib/inhalt';
+
+export function getStaticPaths() {
+  return leistungen.map((l) => ({ params: { leistung: l.id }, props: { l } }));
+}
+const { l } = Astro.props as { l: Leistung };
+
+const titel = l.seoTitel || `${l.ueberschrift} – ${e.firma}`;
+const beschreibung = l.seoBeschreibung || l.einleitung[0].slice(0, 155);
+const stimmen = bewertungenZu(l.id);
+const baustellen = projekteZu(l.id);
+const andere = leistungen.filter((x) => x.id !== l.id);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: l.name,
+    serviceType: l.name,
+    description: beschreibung,
+    provider: { '@id': e.domain.replace(/\/$/, '') + '/#firma' },
+    areaServed: e.einsatzgebiet,
+  },
+  ...(l.fragen.length ? [{
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: l.fragen.map((f) => ({ '@type': 'Question', name: f.frage, acceptedAnswer: { '@type': 'Answer', text: f.antwort } })),
+  }] : []),
+];
+---
+<Seite titel={titel} beschreibung={beschreibung} ogBild={l.bilder[0]?.datei} brotkrumen={[{ name: l.name, pfad: url.leistung(l.id) }]} jsonLd={jsonLd}>
+
+  <section class="unterseite-kopf">
+    <h1>{l.ueberschrift}</h1>
+    {l.einleitung.map((a) => <p>{a}</p>)}
+    <p class="ruf">Rufen Sie einfach an:<br><a href={telLink()}>{e.telefonAnzeige}</a></p>
+    <p class="klein">Oder schicken Sie Fotos per <a href={whatsappLink()}>WhatsApp</a>.</p>
+  </section>
+
+  {l.leistungsliste.length > 0 && (
+    <section class="leistungen">
+      <h2>Was wir dabei machen</h2>
+      <ul class="haekchen">{l.leistungsliste.map((p) => <li>{p}</li>)}</ul>
+    </section>
+  )}
+
+  {l.bilder.length > 0 && (
+    <section class="baustellen">
+      <h2>So sieht das bei uns aus</h2>
+      <ul class="reihe">
+        {l.bilder.map((b) => <li><Bild datei={b.datei} alt={b.alt} quadrat breite={700} />{b.beschriftung && <span>{b.beschriftung}</span>}</li>)}
+      </ul>
+    </section>
+  )}
+
+  {baustellen.length > 0 && (
+    <section class="projekt-liste">
+      <h2>Baustellen zu diesem Thema</h2>
+      <ul>
+        {baustellen.map((p) => (
+          <li>
+            <a href={url.projekt(p.id)}>
+              <Bild datei={p.bilder[p.bilder.length - 1].datei} alt="" quadrat breite={400} sizes="(min-width: 960px) 20vw, 40vw" />
+              <span>{p.titel}{p.ort && <small>{p.ort}</small>}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {stimmen.length > 0 && (
+    <section class="stimmen">
+      <h2>Was Kunden dazu schreiben</h2>
+      <div class="zettelwand">{stimmen.map((b, i) => <Zettel b={b} i={i} />)}</div>
+    </section>
+  )}
+
+  {l.fragen.length > 0 && (
+    <section class="fragen">
+      <h2>Häufige Fragen</h2>
+      {l.fragen.map((f) => <details><summary>{f.frage}</summary><p>{f.antwort}</p></details>)}
+    </section>
+  )}
+
+  <section class="kontakt">
+    <h2>Erzählen Sie mir, worum es geht</h2>
+    <p>Am schnellsten geht es am Telefon. Zur Besichtigung komme ich selbst.</p>
+    <p class="ruf"><a href={telLink()}>{e.telefonAnzeige}</a></p>
+    <p><a class="pfeil-link" href="/#kontakt">Oder schreiben Sie uns</a></p>
+    {andere.length > 0 && <>
+      <h3 class="andere-titel">Weitere Leistungen</h3>
+      <ul class="andere">{andere.map((x) => <li><a class="pfeil-link" href={url.leistung(x.id)}>{x.name}</a></li>)}</ul>
+    </>}
+  </section>
+
+</Seite>

@@ -1,0 +1,28 @@
+{
+  "name": "Trockenbau",
+  "kurzname": "Trockenbau",
+  "kurz": "Ständerwerk, Gipsplatten, Vorwandinstallation, Dachausbau",
+  "ueberschrift": "Trockenbau in Flensburg und Umgebung",
+  "einleitung": [
+    "Mit Trockenbau entstehen neue Wände, Vorwände für Bad und WC oder ein ausgebautes Dachgeschoss – ohne nassen Putz und mit wenig Wartezeit.",
+    "Im Altbau sieht man die meiste Arbeit später gar nicht mehr: neue Leitungen, Vorwandinstallation, Ständerwerk. Wir dokumentieren die Arbeitsschritte mit Fotos."
+  ],
+  "leistungsliste": [
+    "Ständerwerk für neue Wände",
+    "Gipsplatten verlegen, grundieren und verspachteln",
+    "Vorwandinstallation für WC und Waschtisch",
+    "Dachschrägen und Gauben verkleiden"
+  ],
+  "fragen": [
+    { "frage": "Kann man mit Trockenbau einen Raum teilen?", "antwort": "Ja. Eine Trockenbauwand ist schnell gestellt und kann direkt verspachtelt und gestrichen werden." }
+  ],
+  "bilder": [
+    { "datei": "altbau-5.jpg", "beschriftung": "Ständerwerk", "alt": "Ständerwerk für neue Trockenbauwände" },
+    { "datei": "altbau-6.jpg", "beschriftung": "Wand mit Anschlüssen", "alt": "Trockenbauwand mit markierten Anschlüssen" },
+    { "datei": "altbau-3.jpg", "beschriftung": "Vorwand für WC und Waschtisch", "alt": "Vorwandelemente für WC und Waschtisch" }
+  ],
+  "reihenfolge": 4,
+  "seoTitel": "Trockenbau in Flensburg – Checkinterne GmbH",
+  "seoBeschreibung": "Trockenbau in Flensburg und Umgebung: neue Wände, Gipsplatten, Vorwandinstallation und Dachausbau. Jetzt anrufen.",
+  "entwurf": true
+}
