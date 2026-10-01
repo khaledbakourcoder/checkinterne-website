@@ -1,5 +1,5 @@
 {
-  "titel": "Eine Küche, die erst mal keine war",
+  "titel": "Eine Küche, die erst mal keine war NEUEE",
   "ort": "Flensburg",
   "leistungen": [
     "malerarbeiten-flensburg",
@@ -11,7 +11,7 @@
   "bilder": [
     {
       "datei": "kueche-1.jpg",
-      "beschriftung": "Am Anfang Neu",
+      "beschriftung": "Am Anfang ",
       "alt": "Küche im Rohzustand: offene Wand, alte Unterschränke"
     },
     {
