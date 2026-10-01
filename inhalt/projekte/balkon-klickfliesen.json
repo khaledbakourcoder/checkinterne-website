@@ -1,15 +1,35 @@
 {
   "titel": "Ein Balkon, auf dem man wieder sitzen will",
   "ort": "",
-  "leistungen": ["fliesenleger-flensburg"],
+  "leistungen": [
+    "fliesenleger-flensburg",
+    "malerarbeiten-flensburg"
+  ],
   "absaetze": [
-    "Moos und grüner Belag auf dem Beton. Erst gründlich reinigen, dann Klickfliesen verlegen – das geht oft an einem Tag."
+    "Moos und grüner Belag auf dem Beton. Erst gründlich reinigen, dann Klickfliesen verlegen – das geht oft an einem Tag.",
+    "Hlalo\n"
   ],
   "bilder": [
-    { "datei": "balkon-1.jpg", "beschriftung": "Vorher", "alt": "Verschmutzter Balkonboden mit Moos" },
-    { "datei": "balkon-3.jpg", "beschriftung": "Gereinigt", "alt": "Balkon gereinigt, Werkzeug auf dem Boden" },
-    { "datei": "balkon-5.jpg", "beschriftung": "Fliesen liegen", "alt": "Balkon mit grauen Klickfliesen in der Sonne" },
-    { "datei": "balkon-6.jpg", "beschriftung": "Mit Blumen", "alt": "Fertiger Balkon mit Blumen" }
+    {
+      "datei": "balkon-1.jpg",
+      "beschriftung": "Vorher",
+      "alt": "Verschmutzter Balkonboden mit Moos"
+    },
+    {
+      "datei": "balkon-3.jpg",
+      "beschriftung": "Gereinigt",
+      "alt": "Balkon gereinigt, Werkzeug auf dem Boden"
+    },
+    {
+      "datei": "balkon-5.jpg",
+      "beschriftung": "Fliesen liegen",
+      "alt": "Balkon mit grauen Klickfliesen in der Sonne"
+    },
+    {
+      "datei": "balkon-6.jpg",
+      "beschriftung": "Mit Blumen",
+      "alt": "Fertiger Balkon mit Blumen"
+    }
   ],
   "aufStartseite": true,
   "reihenfolge": 3,
