@@ -6,6 +6,7 @@ import { definitionen, seitenPfade } from './definitionen.js';
 import { feld, fehlendePflichtfelder, nachInternational } from './formular.js';
 import { pruefe, googleVorschau, ampelListe, effektiv } from './seo.js';
 import { fotoVorbereiten, blobZuBase64, freierName } from './fotos.js';
+import { symbol } from './symbole.js';
 
 const app = document.getElementById('app');
 const statusLeiste = document.getElementById('status');
@@ -28,7 +29,11 @@ async function api(pfad, { methode = 'GET', body } = {}) {
     credentials: 'same-origin',
   });
   const daten = await antwort.json().catch(() => ({}));
-  if (antwort.status === 401) throw new Error('Sie sind nicht mehr angemeldet. Bitte die Seite neu laden.');
+  if (antwort.status === 401) {
+    // Anmeldung abgelaufen: zur Anmeldeseite (bei ungespeicherten Änderungen fragt der Browser vorher nach)
+    location.href = '/admin/anmelden';
+    throw new Error('Sie sind nicht mehr angemeldet.');
+  }
   if (!antwort.ok) throw new Error(daten.fehler || `Fehler ${antwort.status}`);
   return daten;
 }
@@ -38,7 +43,8 @@ async function laden() {
   z.meta = { modus: d.modus, unveroeffentlicht: d.unveroeffentlicht, vorschauUrl: d.vorschauUrl, nutzer: d.nutzer };
   z.inhalt = d.inhalt;
   z.bilder = new Set(d.bilder);
-  document.getElementById('nutzer').textContent = d.nutzer;
+  document.getElementById('nutzer').textContent = d.nutzer.replace(/@dashboard$/, '');
+  document.getElementById('abmelden').hidden = d.modus === 'lokal';
   document.getElementById('nav-verlauf').hidden = d.modus === 'lokal';
   zeigeStatus();
 }
@@ -82,7 +88,7 @@ function fotoAuswaehlen() {
     const alle = [...z.neueFotos.keys(), ...[...z.bilder].sort()];
     const dialog = h('dialog', { 'aria-label': 'Foto auswählen' },
       h('div', { class: 'dialog-kopf' }, h('strong', { text: 'Vorhandenes Foto wählen' }),
-        h('button', { type: 'button', class: 'mini', 'aria-label': 'Schließen', onclick: () => dialog.close() }, '✕')),
+        h('button', { type: 'button', class: 'mini', onclick: () => dialog.close() }, symbol('schliessen'), 'Schließen')),
       h('div', { class: 'galerie' }, alle.map((d) => h('button', { type: 'button', title: d, onclick: () => { dialog.returnValue = d; dialog.close(); } },
         h('img', { src: basisCtx().fotoUrl(d), alt: d, loading: 'lazy' })))),
     );
@@ -166,7 +172,7 @@ async function veroeffentlichen() {
 // ---------- Bildschirme ----------
 function kopf(titel, { zurueck, untertitel, knopf } = {}) {
   return [
-    zurueck && h('a', { class: 'zurueck', href: zurueck, text: 'Zurück' }),
+    zurueck && h('a', { class: 'zurueck', href: zurueck }, symbol('zurueck'), 'Zurück'),
     h('div', { class: 'kopfzeile' },
       h('div', {}, h('h1', { text: titel }), untertitel && h('p', { class: 'untertitel', text: untertitel })),
       knopf),
@@ -174,13 +180,13 @@ function kopf(titel, { zurueck, untertitel, knopf } = {}) {
 }
 
 function start() {
-  const aufgabe = (href, titel, text) => h('a', { class: 'aufgabe', href }, titel, h('small', { text }));
+  const aufgabe = (href, sym, titel, text) => h('a', { class: 'aufgabe', href }, h('span', { class: 'aufgabe-symbol' }, symbol(sym)), titel, h('small', { text }));
   return [
     ...kopf('Was möchten Sie ändern?', { untertitel: 'Wählen Sie einen Bereich. Alle Bereiche finden Sie auch links.' }),
     h('div', { class: 'aufgaben' },
-      aufgabe('#/projekte', 'Baustellen', 'Texte und Fotos Ihrer Baustellen'),
-      aufgabe('#/leistungen', 'Leistungen', 'Texte und Fotos Ihrer Leistungsseiten'),
-      aufgabe('#/seite/einstellungen', 'Kontaktdaten', 'Telefon, WhatsApp, E-Mail, Adresse'),
+      aufgabe('#/projekte', 'baustelle', 'Baustellen', 'Texte und Fotos Ihrer Baustellen'),
+      aufgabe('#/leistungen', 'werkzeug', 'Leistungen', 'Texte und Fotos Ihrer Leistungsseiten'),
+      aufgabe('#/seite/einstellungen', 'telefon', 'Kontaktdaten', 'Telefon, WhatsApp, E-Mail, Adresse'),
     ),
   ];
 }
@@ -200,11 +206,11 @@ function liste(art) {
 // Gemeinsamer Aufbau: Formular links, rechts Speichern (+ Sichtbar-Schalter) und Google-Vorschau
 function editorLayout({ titel, zurueck, ansehen, hinweis, formular, aktionen, seoBox }) {
   return [
-    ...kopf(titel, { zurueck, knopf: ansehen && h('a', { class: 'knopf', href: ansehen, target: '_blank', rel: 'noopener' }, 'Auf der Website ansehen ↗') }),
+    ...kopf(titel, { zurueck, knopf: ansehen && h('a', { class: 'knopf', href: ansehen, target: '_blank', rel: 'noopener' }, symbol('extern'), 'Auf der Website ansehen') }),
     hinweis && h('p', { class: 'hinweisbox', text: hinweis }),
     h('div', { class: 'editor' },
       formular,
-      h('aside', { class: 'editor-seite' }, h('div', { class: 'karte aktionen' }, aktionen), seoBox)),
+      h('aside', { class: 'editor-seite' }, h('div', { class: 'karte aktionen' }, h('h2', { text: 'Fertig?' }), aktionen), seoBox)),
   ];
 }
 
@@ -213,9 +219,9 @@ function speicherKnopf(beiKlick) {
     type: 'button', class: 'knopf voll',
     onclick: async () => {
       knopf.disabled = true; knopf.textContent = 'Speichert …';
-      try { await beiKlick(); } catch (e) { melde(e.message, { fehler: true }); } finally { knopf.disabled = false; knopf.textContent = 'Speichern'; }
+      try { await beiKlick(); } catch (e) { melde(e.message, { fehler: true }); } finally { knopf.disabled = false; leeren(knopf).append(symbol('haken'), 'Speichern'); }
     },
-  }, 'Speichern');
+  }, symbol('haken'), 'Speichern');
   return knopf;
 }
 
@@ -227,10 +233,9 @@ function eintragEditor(art, id) {
   if (!id || !original) return [...kopf('Nicht gefunden', { zurueck: '#/' }), h('p', { text: 'Diese Seite gibt es nicht.' })];
 
   const arbeit = kopie(original);
-  const formBox = h('div');
+  const formBox = h('div', { class: 'abschnitte' });
   const seoBox = h('div', { class: 'karte' });
   const sichtbarBox = h('div');
-  let erweitertOffen = false;
 
   const ctx = () => ({
     ...basisCtx(),
@@ -240,8 +245,9 @@ function eintragEditor(art, id) {
 
   function zeichneSeitenspalte() {
     const erg = pruefe(art, arbeit, ctx());
-    leeren(seoBox).append(h('h2', { text: 'So erscheint die Seite bei Google' }), googleVorschau(erg.effektiv, einstellungen().domain), ...ampelListe(erg));
+    leeren(seoBox).append(h('h2', { class: 'mit-symbol' }, symbol('lupe'), 'So erscheint die Seite bei Google'), googleVorschau(erg.effektiv, einstellungen().domain), ...ampelListe(erg));
     leeren(sichtbarBox).append(
+      h('p', { class: 'sichtbar-titel' }, symbol('auge'), 'Sichtbarkeit'),
       h('label', { class: 'schalter' },
         h('input', {
           type: 'checkbox', checked: !arbeit.entwurf, disabled: arbeit.entwurf && erg.rot > 0,
@@ -265,15 +271,8 @@ function eintragEditor(art, id) {
   };
   function zeichneFormular() {
     const y = window.scrollY;
-    // Technisches (Sortierung, eigene Google-Texte) zugeklappt unter „Erweitert“
-    const normal = def.felder.filter((f) => !f.erweitert);
-    const extra = def.felder.find((f) => f.erweitert);
-    leeren(formBox).append(h('div', { class: 'karte' },
-      normal.map((f) => feld(f, arbeit, formCtx)),
-      extra && h('details', { class: 'gruppe', open: erweitertOffen || undefined, ontoggle: (e) => { erweitertOffen = e.target.open; } },
-        h('summary', { text: 'Erweitert' }),
-        extra.felder.map((f) => feld(f, arbeit, formCtx))),
-    ));
+    // Jeder Abschnitt ist eine eigene Karte; Technisches steht zugeklappt ganz unten
+    leeren(formBox).append(...def.felder.map((f) => feld(f, arbeit, formCtx)));
     window.scrollTo(0, y);
     zeichneSeitenspalte();
   }
@@ -306,12 +305,12 @@ function seitenEditor(name) {
   if (!def || !pfad) return [...kopf('Nicht gefunden', { zurueck: '#/' })];
   const original = z.inhalt[pfad];
   const arbeit = kopie(original);
-  const formBox = h('div');
+  const formBox = h('div', { class: 'abschnitte' });
   const seoBox = name === 'startseite' ? h('div', { class: 'karte' }) : null;
 
   const zeichneSeo = () => {
     if (!seoBox) return;
-    leeren(seoBox).append(h('h2', { text: 'So erscheint die Startseite bei Google' }), googleVorschau(effektiv('startseite', arbeit, basisCtx()), einstellungen().domain));
+    leeren(seoBox).append(h('h2', { class: 'mit-symbol' }, symbol('lupe'), 'So erscheint die Startseite bei Google'), googleVorschau(effektiv('startseite', arbeit, basisCtx()), einstellungen().domain));
   };
   const ctx = {
     ...basisCtx(),
@@ -319,7 +318,7 @@ function seitenEditor(name) {
     geaendert: () => { z.ungespeichert = !gleich(arbeit, original) || z.neueFotos.size > 0; zeichneSeo(); },
     neuZeichnen: () => {
       const y = window.scrollY;
-      leeren(formBox).append(h('div', { class: 'karte' }, def.felder.map((f) => feld(f, arbeit, ctx))));
+      leeren(formBox).append(...def.felder.map((f) => feld(f, arbeit, ctx)));
       window.scrollTo(0, y);
       zeichneSeo();
     },
@@ -355,7 +354,7 @@ async function verlauf() {
             zeige();
           } catch (err) { melde(err.message, { fehler: true }); }
         },
-      }, 'Rückgängig'),
+      }, symbol('rueckgaengig'), 'Rückgängig'),
     ))));
   }).catch((e) => leeren(box).append(h('li', {}, h('div', { class: 'zeile', text: e.message }))));
   return [...kopf('Verlauf', { untertitel: 'Ihre letzten Änderungen. Etwas falsch gemacht? Einfach rückgängig machen.' }), box];
@@ -397,6 +396,32 @@ window.addEventListener('hashchange', () => {
   zeige();
 });
 window.addEventListener('beforeunload', (e) => { if (z.ungespeichert) { e.preventDefault(); e.returnValue = ''; } });
+
+document.getElementById('abmelden').addEventListener('click', async () => {
+  if (z.ungespeichert && !confirm('Sie haben noch nicht gespeichert. Trotzdem abmelden?')) return;
+  z.ungespeichert = false;
+  await fetch('/api/abmelden', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CMS': '1' }, body: '{}', credentials: 'same-origin' }).catch(() => {});
+  location.replace('/admin/anmelden');
+});
+document.getElementById('abmelden').prepend(symbol('abmelden'));
+
+// Symbole in der Seitenleiste (immer mit Text daneben)
+document.querySelectorAll('#navigation a[data-symbol]').forEach((a) => a.prepend(symbol(a.dataset.symbol)));
+
+// Handy/Tablet: Bereiche hinter dem Knopf „Menü“ – schließt nach Auswahl, bei Esc und bei Klick daneben
+const leiste = document.querySelector('.seitenleiste');
+const menueKnopf = document.getElementById('menue-knopf');
+function menue(offen) {
+  leiste.classList.toggle('offen', offen);
+  menueKnopf.setAttribute('aria-expanded', String(offen));
+  leeren(menueKnopf).append(symbol(offen ? 'schliessen' : 'menue'), offen ? 'Schließen' : 'Menü');
+}
+menue(false);
+// stopPropagation: der Knopf tauscht beim Umschalten seinen Inhalt aus – sonst hielte „Klick daneben“ ihn für außerhalb
+menueKnopf.addEventListener('click', (e) => { e.stopPropagation(); menue(!leiste.classList.contains('offen')); });
+document.getElementById('navigation').addEventListener('click', (e) => { if (e.target.closest('a')) menue(false); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && leiste.classList.contains('offen')) { menue(false); menueKnopf.focus(); } });
+document.addEventListener('click', (e) => { if (leiste.classList.contains('offen') && !leiste.contains(e.target)) menue(false); });
 
 laden().then(zeige).catch((e) => {
   leeren(app).append(h('h1', { text: 'Das Dashboard konnte nicht geladen werden.' }), h('p', { text: e.message }));

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Anmelden – Checkinterne</title>
+  <link rel="stylesheet" href="admin.css">
+  <script type="module" src="anmelden.js"></script>
+</head>
+<body class="anmelde-seite">
+  <main class="anmelde-karte">
+    <p class="anmelde-marke">Checkinterne<small>Website bearbeiten</small></p>
+    <h1>Anmelden</h1>
+    <form id="anmelden" novalidate>
+      <label for="benutzer">Benutzername</label>
+      <input id="benutzer" name="benutzer" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      <label for="passwort">Passwort</label>
+      <div class="passwort-zeile">
+        <input id="passwort" name="passwort" type="password" autocomplete="current-password" required>
+        <button type="button" class="knopf klein" id="zeigen" aria-pressed="false">Zeigen</button>
+      </div>
+      <p class="anmelde-fehler" id="fehler" role="alert" hidden></p>
+      <button type="submit" class="knopf voll anmelde-knopf" id="absenden">Anmelden</button>
+    </form>
+    <p class="anmelde-hinweis">Nach dem Anmelden bleiben Sie auf diesem Gerät 7 Tage angemeldet.</p>
+  </main>
+</body>
+</html>
