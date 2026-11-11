@@ -1,0 +1,22 @@
+{
+  "titel": "ZZ Online-Test Baustelle (bitte ignorieren)",
+  "ort": "",
+  "leistungen": [
+    "badsanierung-flensburg"
+  ],
+  "absaetze": [
+    "Technischer Test des Dashboards. Wird gleich wieder gelöscht."
+  ],
+  "bilder": [
+    {
+      "datei": "zz-online-test-baustelle-bitte-ignorieren-1.jpg",
+      "alt": "ZZ Online-Test Baustelle (bitte ignorieren), Foto 1",
+      "beschriftung": ""
+    }
+  ],
+  "aufStartseite": false,
+  "reihenfolge": 0,
+  "seoTitel": "",
+  "seoBeschreibung": "",
+  "entwurf": true
+}
