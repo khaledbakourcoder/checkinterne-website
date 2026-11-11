@@ -1,0 +1,11 @@
+---
+import Seite from '../layouts/Seite.astro';
+import { einstellungen as e, telLink } from '../lib/inhalt';
+---
+<Seite titel={`Seite nicht gefunden · ${e.firma}`} beschreibung="Diese Seite gibt es nicht (mehr).">
+  <section class="rechtstext">
+    <h1>Diese Seite gibt es nicht</h1>
+    <p>Die Adresse stimmt nicht, oder die Seite wurde verschoben. Gehen Sie am besten zurück zur <a href="/">Startseite</a>.</p>
+    {e.telefonAnzeige && <p>Oder rufen Sie einfach an: <a href={telLink()}>{e.telefonAnzeige}</a></p>}
+  </section>
+</Seite>
