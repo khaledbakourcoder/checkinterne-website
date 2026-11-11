@@ -6,9 +6,7 @@
 //   schreibe({ nachricht, autor, aenderungen: [{ pfad, bytes | null }] }) -> { commit }
 //   status()                    -> { modus, unveroeffentlicht }
 //   veroeffentliche(autor)      -> void
-//   verlauf()                   -> [{ sha, nachricht, datum, autor }]
-//   commitDetails(sha)          -> { nachricht, dateien: [{ pfad, vorher: Uint8Array | null }] }
-import { CmsFehler, base64ZuBytes, textZuBytes, bytesZuText } from './hilfen.js';
+import { CmsFehler, base64ZuBytes, textZuBytes } from './hilfen.js';
 import { pruefeInhalt, INHALT_PFAD, BILDNAME, BILD_ORDNER, MAX_BILD_BYTES } from './pruefung.js';
 
 // Grenze wegen der 50 Unteranfragen pro Aufruf bei Cloudflare (ein Foto = eine Anfrage an GitHub)
@@ -16,13 +14,21 @@ const MAX_BILDER_PRO_SPEICHERN = 20;
 
 const json = (daten, status = 200) => ({ status, json: daten });
 
-// Der Kunde darf nur vorhandene Inhalte ändern: keine neuen Seiten, nichts löschen.
+// Der Kunde darf vorhandene Inhalte ändern und neue Baustellen anlegen, sonst keine neuen Seiten, nichts löschen.
 // Bewertungen kommen später automatisch (API), Weiterleitungen pflegt nur der Entwickler.
 const GESPERRT = new Set(['inhalt/bewertungen.json', 'inhalt/weiterleitungen.json']);
-function pruefeErlaubt(pfad, inhalt, neuerInhalt) {
+// Einzige Ausnahme: neue Baustellen (inhalt/projekte/…) darf der Kunde selbst anlegen.
+const MAX_PROJEKTE = 100;
+function pruefeErlaubt(pfad, inhalt, neuerInhalt, neu = false) {
   if (GESPERRT.has(pfad)) throw new CmsFehler(403, 'Dieser Bereich kann im Dashboard nicht geändert werden.');
-  if (!(pfad in inhalt)) throw new CmsFehler(403, 'Neue Seiten legt der Entwickler an.');
   if (neuerInhalt === null) throw new CmsFehler(403, 'Seiten können im Dashboard nicht gelöscht werden.');
+  if (neu) {
+    if (!pfad.startsWith('inhalt/projekte/')) throw new CmsFehler(403, 'Neue Leistungen und Seiten legt der Entwickler an.');
+    if (pfad in inhalt) throw new CmsFehler(409, 'Eine Baustelle mit diesem Namen gibt es schon. Bitte einen anderen Titel wählen.');
+    if (Object.keys(inhalt).filter((p) => p.startsWith('inhalt/projekte/')).length >= MAX_PROJEKTE) throw new CmsFehler(400, 'Es sind nicht mehr als 100 Baustellen möglich.');
+    return;
+  }
+  if (!(pfad in inhalt)) throw new CmsFehler(403, 'Neue Seiten legt der Entwickler an.');
 }
 
 function bildTyp(datei) {
@@ -83,7 +89,7 @@ async function speichern(speicher, body, nutzer) {
   for (const a of aenderungen) {
     const pfad = String(a?.pfad ?? '');
     if (!INHALT_PFAD.test(pfad)) throw new CmsFehler(400, `Pfad nicht erlaubt: ${pfad}`);
-    pruefeErlaubt(pfad, inhalt, a.inhalt ?? null);
+    pruefeErlaubt(pfad, inhalt, a.inhalt ?? null, a.neu === true);
     inhalt[pfad] = a.inhalt;
     commit.push({ pfad, bytes: textZuBytes(JSON.stringify(a.inhalt, null, 2) + '\n') });
   }
@@ -92,31 +98,6 @@ async function speichern(speicher, body, nutzer) {
   pruefeAlles(inhalt, [...bildSet]);
   const ergebnis = await speicher.schreibe({ nachricht, autor: nutzer, aenderungen: commit });
   return json({ ok: true, ...ergebnis });
-}
-
-// Eine frühere Änderung zurücknehmen: betroffene Dateien auf den Stand davor setzen – mit voller Prüfung.
-async function rueckgaengig(speicher, sha, nutzer) {
-  const details = await speicher.commitDetails(sha);
-  const { inhalt, bilder } = await lade(speicher);
-  const commit = [];
-  for (const { pfad, vorher } of details.dateien) {
-    if (pfad.startsWith(BILD_ORDNER)) continue; // Fotos bleiben liegen, sie stören nicht
-    if (!INHALT_PFAD.test(pfad)) continue;
-    // Auch beim Zurücknehmen: nur vorhandene Seiten ändern, nichts anlegen oder löschen
-    if (vorher === null || !(pfad in inhalt) || GESPERRT.has(pfad)) {
-      throw new CmsFehler(409, 'Diese Änderung kann nur der Entwickler zurücknehmen.');
-    }
-    try { inhalt[pfad] = JSON.parse(bytesZuText(vorher)); } catch { throw new CmsFehler(500, `Alte Version von ${pfad} ist beschädigt.`); }
-    commit.push({ pfad, bytes: vorher });
-  }
-  if (!commit.length) throw new CmsFehler(400, 'Diese Änderung betrifft keine Inhalte.');
-  try {
-    pruefeAlles(inhalt, bilder);
-  } catch (e) {
-    if (e instanceof CmsFehler) throw new CmsFehler(409, `Das lässt sich nicht einzeln zurücknehmen, weil spätere Änderungen darauf aufbauen.\n${e.message}`);
-    throw e;
-  }
-  return speicher.schreibe({ nachricht: `Rückgängig: ${details.nachricht}`.slice(0, 200), autor: nutzer, aenderungen: commit });
 }
 
 export async function bearbeite({ methode, pfad, body }, { speicher, nutzer, vorschauUrl }) {
@@ -134,12 +115,6 @@ export async function bearbeite({ methode, pfad, body }, { speicher, nutzer, vor
     if (methode === 'POST' && pfad === '/api/veroeffentlichen') {
       await speicher.veroeffentliche(nutzer);
       return json({ ok: true });
-    }
-    if (methode === 'GET' && pfad === '/api/verlauf') return json({ eintraege: await speicher.verlauf() });
-    if (methode === 'POST' && pfad === '/api/rueckgaengig') {
-      const sha = String(body?.sha ?? '');
-      if (!/^[0-9a-f]{40}$/.test(sha)) throw new CmsFehler(400, 'Ungültige Version.');
-      return json({ ok: true, ...(await rueckgaengig(speicher, sha, nutzer)) });
     }
     return json({ fehler: 'Unbekannte Anfrage.' }, 404);
   } catch (e) {

@@ -52,10 +52,11 @@ Nach 5 Fehlversuchen ist eine IP für 15 Minuten gesperrt.
 
 ## Was der Kunde im Dashboard darf
 
-- **Nur Vorhandenes bearbeiten:** Texte und Fotos der bestehenden Baustellen, Leistungen, Startseite, Über uns, Einsatzgebiet und Kontaktdaten.
-- **Nicht:** neue Seiten anlegen, Seiten löschen, Adressen ändern, Bewertungen oder Weiterleitungen bearbeiten. Das prüft der Server (`cms/kern.js`), nicht nur die Oberfläche.
+- **Bearbeiten:** Texte und Fotos der bestehenden Baustellen, Leistungen, Startseite, Über uns, Einsatzgebiet und Kontaktdaten.
+- **Neue Baustellen anlegen:** Dashboard → Baustellen → „Neue Baustelle“ (höchstens 100). Die Adresse entsteht aus dem Titel.
+- **Nicht:** neue Leistungen oder andere Seiten anlegen, Seiten löschen, Adressen ändern, Bewertungen oder Weiterleitungen bearbeiten. Das prüft der Server (`cms/kern.js`), nicht nur die Oberfläche.
 - **Speichern = sofort veröffentlichen.** Rückgängig machen geht über „Verlauf“.
-- Neue Leistungen/Baustellen legt der Entwickler als JSON-Datei in `inhalt/` an. Bewertungen sollen später automatisch per API kommen.
+- Neue Leistungen legt der Entwickler als JSON-Datei in `inhalt/` an. Bewertungen sollen später automatisch per API kommen.
 
 ## Sicherheit
 

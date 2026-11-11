@@ -1,5 +1,5 @@
 // Was im Dashboard bearbeitet werden kann – Abschnitte, Felder, Beschriftungen, Hilfetexte.
-// Nur bestehende Inhalte: Neue Seiten legt der Entwickler an, Bewertungen kommen später per API.
+// Neue Baustellen legt der Kunde selbst an; neue Leistungen und Seiten legt der Entwickler an, Bewertungen kommen später per API.
 // Feldtypen: text, textarea, telefon, zahl, schalter, auswahl, mehrfach, textliste, objektliste, foto, fotoliste, fotos-fest
 // Jede Seite besteht aus Abschnitten (eigene Karte mit Symbol und Überschrift), damit klar ist, was zusammengehört.
 import { TITEL_MAX, BESCHREIBUNG_MAX } from './seo.js';

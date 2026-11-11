@@ -40,6 +40,10 @@ const regeln = {
     p.muss(/^https:\/\/[^\s/]+\.[^\s/]+\/?$/.test(d.domain ?? ''), 'domain', 'muss wie https://www.beispiel.de aussehen');
     p.muss(/^\+?[0-9]*$/.test(d.telefon ?? ''), 'telefon', 'nur Ziffern, optional mit + am Anfang');
     p.muss(/^[0-9]*$/.test(d.whatsapp ?? ''), 'whatsapp', 'nur Ziffern (mit Ländervorwahl, ohne +)');
+    const ziffern = (v) => String(v ?? '').replace(/\D/g, '').length;
+    p.muss(!d.telefon || ziffern(d.telefon) >= 8, 'Telefonnummer', 'bitte eine vollständige Nummer eintragen, z. B. 0461 123 456');
+    p.muss(!d.whatsapp || ziffern(d.whatsapp) >= 8, 'WhatsApp-Nummer', 'bitte eine vollständige Nummer eintragen, z. B. 0176 1234567');
+    p.muss(!d.email?.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email.trim()), 'E-Mail', 'bitte eine gültige Adresse eintragen, z. B. info@firma.de');
   },
   startseite(p, d, bekannt) {
     for (const k of ['seoTitel', 'seoBeschreibung', 'ueberschrift', 'baustellenUeberschrift', 'leistungenUeberschrift', 'kontaktUeberschrift'])

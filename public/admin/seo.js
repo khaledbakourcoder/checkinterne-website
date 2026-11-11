@@ -4,9 +4,9 @@ import { h, woerter } from './dom.js';
 export const TITEL_MAX = 60;
 export const BESCHREIBUNG_MAX = 155;
 // Unter MIN_... kann eine Leistungsseite nicht online gehen, unter GUT_... gibt es nur einen Tipp
-const MIN_WOERTER_LEISTUNG = 150;
-const GUT_WOERTER_LEISTUNG = 250;
-const MIN_WOERTER_PROJEKT = 60;
+const MIN_WOERTER_LEISTUNG = 25;
+const GUT_WOERTER_LEISTUNG = 100;
+const MIN_WOERTER_PROJEKT = 40;
 
 const kuerzen = (t, n) => (t.length > n ? t.slice(0, n - 1).trimEnd() + ' …' : t);
 

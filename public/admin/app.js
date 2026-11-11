@@ -1,6 +1,6 @@
 // Dashboard für die Website – Navigation, Bildschirme, Speichern.
 // Der Kunde bearbeitet nur Vorhandenes: Texte und Fotos der bestehenden Seiten, Baustellen und Leistungen.
-// Neue Seiten legt der Entwickler an; Bewertungen kommen später automatisch (API).
+// Neue Baustellen legt der Kunde selbst an; neue Leistungen und Seiten legt der Entwickler an; Bewertungen kommen später automatisch (API).
 import { h, leeren, melde, zuSlug, kopie, gleich } from './dom.js';
 import { definitionen, seitenPfade } from './definitionen.js';
 import { feld, fehlendePflichtfelder, nachInternational } from './formular.js';
@@ -45,7 +45,6 @@ async function laden() {
   z.bilder = new Set(d.bilder);
   document.getElementById('nutzer').textContent = d.nutzer.replace(/@dashboard$/, '');
   document.getElementById('abmelden').hidden = d.modus === 'lokal';
-  document.getElementById('nav-verlauf').hidden = d.modus === 'lokal';
   zeigeStatus();
 }
 
@@ -128,11 +127,11 @@ function automatischErgaenzen(name, d) {
 }
 
 // Speichern heißt: sofort auf die Website. Einen extra Schritt „Veröffentlichen“ gibt es für den Kunden nicht.
-async function speichern(pfad, inhalt, nachricht) {
+async function speichern(pfad, inhalt, nachricht, { neu = false } = {}) {
   const namen = genutzteFotos(inhalt);
   if (namen.size > 20) throw new Error(`Bitte höchstens 20 neue Fotos auf einmal speichern (jetzt: ${namen.size}). Einige entfernen, speichern, dann die nächsten hinzufügen.`);
   const bilder = await Promise.all([...namen].map(async (datei) => ({ datei, base64: await blobZuBase64(z.neueFotos.get(datei).blob) })));
-  await api('/api/speichern', { methode: 'POST', body: { nachricht, dateien: [{ pfad, inhalt }], bilder } });
+  await api('/api/speichern', { methode: 'POST', body: { nachricht, dateien: [{ pfad, inhalt, neu }], bilder } });
   for (const n of namen) { URL.revokeObjectURL(z.neueFotos.get(n).url); z.neueFotos.delete(n); }
   z.ungespeichert = false;
   if (z.meta.modus !== 'lokal') {
@@ -195,7 +194,10 @@ function liste(art) {
   const istLeistung = art === 'leistung';
   const daten = istLeistung ? leistungen() : projekte();
   return [
-    ...kopf(istLeistung ? 'Leistungen' : 'Baustellen', { untertitel: 'Zum Bearbeiten anklicken.' }),
+    ...kopf(istLeistung ? 'Leistungen' : 'Baustellen', {
+      untertitel: 'Zum Bearbeiten anklicken.',
+      knopf: !istLeistung && h('a', { class: 'knopf voll', href: '#/projekt-neu' }, symbol('baustelle'), 'Neue Baustelle'),
+    }),
     h('ul', { class: 'liste' }, daten.map((d) => h('li', {}, h('a', { href: `#/${art}/${d.id}` },
       h('span', {}, istLeistung ? d.name : d.titel, h('small', { text: istLeistung ? d.kurz : [d.ort, `${d.bilder.length} Fotos`].filter(Boolean).join(' · ') })),
       h('span', { class: `marke-status ${d.entwurf ? 'entwurf' : 'online'}`, text: d.entwurf ? 'Noch nicht sichtbar' : 'Sichtbar' }),
@@ -225,21 +227,40 @@ function speicherKnopf(beiKlick) {
   return knopf;
 }
 
-// Editor für eine bestehende Leistung oder Baustelle
-function eintragEditor(art, id) {
+// Leere Baustelle zum Ausfüllen. Neueste Baustelle steht ganz oben (kleinste Reihenfolge).
+function neueBaustelle() {
+  const reihen = projekte().map((p) => p.reihenfolge ?? 99);
+  return {
+    titel: '', ort: '', leistungen: [], absaetze: [''], bilder: [],
+    aufStartseite: false, reihenfolge: Math.min(1, ...reihen) - 1,
+    seoTitel: '', seoBeschreibung: '', entwurf: false,
+  };
+}
+
+// Adresse aus dem Titel, bei Doppelungen mit Zahl dahinter („bad-im-altbau-2“)
+function freierSlug(titel) {
+  const vergeben = new Set(projekte().map((p) => p.id));
+  const basis = zuSlug(titel) || 'baustelle';
+  let slug = basis;
+  for (let n = 2; vergeben.has(slug); n++) slug = `${basis}-${n}`;
+  return slug;
+}
+
+// Editor für eine bestehende Leistung oder Baustelle – oder (neu) für eine neue Baustelle
+function eintragEditor(art, id, { neu = false } = {}) {
   const def = definitionen[art];
-  const pfad = P[art](id);
-  const original = z.inhalt[pfad];
-  if (!id || !original) return [...kopf('Nicht gefunden', { zurueck: '#/' }), h('p', { text: 'Diese Seite gibt es nicht.' })];
+  const original = neu ? neueBaustelle() : z.inhalt[P[art](id)];
+  if (!neu && (!id || !original)) return [...kopf('Nicht gefunden', { zurueck: '#/' }), h('p', { text: 'Diese Seite gibt es nicht.' })];
 
   const arbeit = kopie(original);
+  const slugVon = () => (neu ? freierSlug(arbeit.titel) : id);
   const formBox = h('div', { class: 'abschnitte' });
   const seoBox = h('div', { class: 'karte' });
   const sichtbarBox = h('div');
 
   const ctx = () => ({
     ...basisCtx(),
-    slug: id,
+    slug: slugVon(),
     andereLeistungen: leistungen().filter((l) => l.id !== id),
   });
 
@@ -265,7 +286,7 @@ function eintragEditor(art, id) {
 
   const formCtx = {
     ...basisCtx(),
-    fotoHochladen: fotoHochladerFuer(() => id),
+    fotoHochladen: fotoHochladerFuer(() => slugVon()),
     geaendert,
     neuZeichnen: zeichneFormular,
   };
@@ -284,14 +305,17 @@ function eintragEditor(art, id) {
     if (!arbeit.entwurf) fehler.push(...erg.punkte.filter((x) => x.stufe === 'rot').map((x) => x.text));
     if (fehler.length) { melde(`Bitte noch ergänzen:\n• ${[...new Set(fehler)].join('\n• ')}`, { fehler: true }); return; }
     automatischErgaenzen(art, arbeit);
-    await speichern(pfad, arbeit, `${def.titel} „${art === 'leistung' ? arbeit.name : arbeit.titel}“ geändert`);
-    zeige();
+    const slug = slugVon();
+    await speichern(P[art](slug), arbeit, `${def.titel} „${art === 'leistung' ? arbeit.name : arbeit.titel}“ ${neu ? 'angelegt' : 'geändert'}`, { neu });
+    if (neu) location.hash = `#/projekt/${slug}`;
+    else zeige();
   });
 
   return editorLayout({
-    titel: art === 'leistung' ? original.name : original.titel,
+    titel: neu ? 'Neue Baustelle' : art === 'leistung' ? original.name : original.titel,
+    hinweis: neu ? 'Titel, Leistungen, Beschreibung und mindestens ein Foto ausfüllen, dann unten rechts speichern. Danach ist die Baustelle in 1–2 Minuten auf der Website.' : undefined,
     zurueck: art === 'leistung' ? '#/leistungen' : '#/projekte',
-    ansehen: !original.entwurf && (z.meta.vorschauUrl || '') + seitenPfad(art, id),
+    ansehen: !neu && !original.entwurf && (z.meta.vorschauUrl || '') + seitenPfad(art, id),
     formular: formBox,
     aktionen: [h('div', { class: 'knoepfe' }, knopf), sichtbarBox],
     seoBox,
@@ -336,30 +360,6 @@ function seitenEditor(name) {
   return editorLayout({ titel: def.titel, hinweis: def.hinweis, formular: formBox, aktionen: h('div', { class: 'knoepfe' }, knopf), seoBox });
 }
 
-async function verlauf() {
-  const box = h('ul', { class: 'liste verlauf' }, h('li', {}, h('div', { class: 'zeile', text: 'Wird geladen …' })));
-  api('/api/verlauf').then(({ eintraege: liste }) => {
-    if (!liste.length) { leeren(box).append(h('li', {}, h('div', { class: 'zeile', text: 'Noch keine Änderungen.' }))); return; }
-    leeren(box).append(...liste.map((e) => h('li', {}, h('div', { class: 'zeile' },
-      h('span', {}, e.nachricht, h('small', { text: `${new Date(e.datum).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' })} · ${e.autor}` })),
-      h('button', {
-        type: 'button', class: 'knopf klein',
-        onclick: async () => {
-          if (!confirm(`„${e.nachricht}“ rückgängig machen?`)) return;
-          try {
-            await api('/api/rueckgaengig', { methode: 'POST', body: { sha: e.sha } });
-            if (z.meta.modus !== 'lokal') await api('/api/veroeffentlichen', { methode: 'POST', body: {} }).catch(() => {});
-            await laden();
-            melde('Rückgängig gemacht. In 1–2 Minuten ist es auf der Website zu sehen.');
-            zeige();
-          } catch (err) { melde(err.message, { fehler: true }); }
-        },
-      }, symbol('rueckgaengig'), 'Rückgängig'),
-    ))));
-  }).catch((e) => leeren(box).append(h('li', {}, h('div', { class: 'zeile', text: e.message }))));
-  return [...kopf('Verlauf', { untertitel: 'Ihre letzten Änderungen. Etwas falsch gemacht? Einfach rückgängig machen.' }), box];
-}
-
 // ---------- Navigation ----------
 function markiereNavigation(teile) {
   const [a = '', b = ''] = teile;
@@ -376,9 +376,9 @@ async function zeige() {
   if (!teile.length) inhalt = start();
   else if (teile[0] === 'leistungen') inhalt = liste('leistung');
   else if (teile[0] === 'projekte') inhalt = liste('projekt');
+  else if (teile[0] === 'projekt-neu') inhalt = eintragEditor('projekt', null, { neu: true });
   else if (teile[0] === 'leistung' || teile[0] === 'projekt') inhalt = eintragEditor(teile[0], teile[1]);
   else if (teile[0] === 'seite') inhalt = seitenEditor(teile[1]);
-  else if (teile[0] === 'verlauf') inhalt = await verlauf();
   else inhalt = [...kopf('Nicht gefunden', { zurueck: '#/' })];
   markiereNavigation(teile);
   leeren(app).append(...[inhalt].flat().filter(Boolean));
