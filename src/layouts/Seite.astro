@@ -1,4 +1,8 @@
 ---
+import '@fontsource/atkinson-hyperlegible-next/400.css';
+import '@fontsource/atkinson-hyperlegible-next/400-italic.css';
+import '@fontsource/atkinson-hyperlegible-next/700.css';
+import '@fontsource/atkinson-hyperlegible-next/800.css';
 import '../styles/seite.css';
 import { getImage } from 'astro:assets';
 import { einstellungen as e, orte, leistungen, url, telLink, whatsappLink, bildDaten } from '../lib/inhalt';
@@ -59,10 +63,6 @@ const daten = [firma, ...krumen, ...jsonLd];
   <meta property="og:description" content={beschreibung}>
   <meta property="og:url" content={kanonisch}>
   {og && <meta property="og:image" content={basis + og.src}>}
-  <!-- TODO vor Livegang: Schrift lokal hosten (DSGVO) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
   {daten.map((d) => <script type="application/ld+json" set:html={JSON.stringify(d).replace(/</g, '\\u003c')} />)}
 </head>
 <body>

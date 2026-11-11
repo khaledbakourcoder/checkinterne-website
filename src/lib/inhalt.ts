@@ -18,6 +18,9 @@ const einstellungenSchema = z.object({
   strasse: text, plz: text, ort: pflicht,
   gewerke: text, einsatzgebiet: text, myhammerUrl: text,
   formularZiel: text, impressumUrl: text, datenschutzUrl: text,
+  // Angaben für das Impressum (pflegt der Entwickler, nicht das Dashboard)
+  rechtsform: text.default(''), registergericht: text.default(''), handelsregister: text.default(''),
+  stammkapital: text.default(''), geschaeftsfuehrer: text.default(''), ustId: text.default(''),
 });
 
 const startseiteSchema = z.object({

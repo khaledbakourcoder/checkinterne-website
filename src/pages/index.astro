@@ -123,18 +123,7 @@ const verteilung = [5, 4, 3, 2, 1].map((n) => {
     <h2>{s.kontaktUeberschrift}</h2>
     {s.kontaktText && <p>{s.kontaktText}</p>}
     <p class="ruf"><a href={telLink()}>{e.telefonAnzeige}</a></p>
-    <p>Fotos schicken Sie am besten per <a href={whatsappLink()}>WhatsApp</a>. Oder Sie schreiben uns hier:</p>
-    <!-- TODO: Formular-Ziel festlegen (einstellungen.formularZiel) -->
-    <form action={e.formularZiel || `mailto:${e.email || 'info@example.de'}`} method="post" enctype={e.formularZiel ? undefined : 'text/plain'}>
-      <label for="f-name">Ihr Name</label>
-      <input id="f-name" name="name" autocomplete="name" required>
-      <label for="f-tel">Telefon, damit ich zurückrufen kann</label>
-      <input id="f-tel" name="telefon" type="tel" inputmode="tel" autocomplete="tel" required>
-      <label for="f-was">Was soll gemacht werden, und wo?</label>
-      <textarea id="f-was" name="nachricht" rows="5"></textarea>
-      <label class="haken"><input type="checkbox" required> Meine Angaben dürfen für die Anfrage genutzt werden. <a href={e.datenschutzUrl || '#'}>Datenschutz</a></label>
-      <button type="submit">Abschicken</button>
-    </form>
+    <p>Fotos schicken Sie am besten per <a href={whatsappLink()}>WhatsApp</a>.{e.email && <> Oder schreiben Sie uns eine E-Mail: <a href={`mailto:${e.email}`}>{e.email}</a></>}</p>
   </section>
 
 </Seite>

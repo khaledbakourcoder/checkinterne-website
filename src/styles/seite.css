@@ -672,3 +672,9 @@ button[type="submit"] { margin-top: 18px; justify-self: start; min-height: 54px;
   .fuss-oben .bauschild { grid-column: auto; }
   .fuss-spalte { padding-top: 8px; }
 }
+
+/* ---------- Impressum und Datenschutz ---------- */
+.rechtstext { max-width: 46rem; margin: 0 auto; }
+.rechtstext h1 { max-width: none; }
+.rechtstext h2 { font-size: 1.25rem; margin: 32px 0 8px; }
+.rechtstext p { margin: 0 0 14px; overflow-wrap: anywhere; }

@@ -1,0 +1,83 @@
+---
+import Seite from '../layouts/Seite.astro';
+import { einstellungen as e, telLink } from '../lib/inhalt';
+
+if (!e.email) console.warn('[Datenschutz] "email" in inhalt/einstellungen.json ist leer. Die Erklärung braucht eine Kontaktadresse.');
+---
+<Seite titel={`Datenschutzerklärung · ${e.firma}`} beschreibung={`Datenschutzerklärung der ${e.firma}, ${e.ort}.`} brotkrumen={[{ name: 'Datenschutz', pfad: '/datenschutz/' }]}>
+  <section class="rechtstext">
+    <h1>Datenschutzerklärung</h1>
+
+    <h2>1. Verantwortlicher</h2>
+    <p>
+      Verantwortlich für die Datenverarbeitung auf dieser Website ist:<br>
+      {e.firma}<br>
+      {e.strasse}, {e.plz} {e.ort}<br>
+      {e.telefonAnzeige && <>Telefon: <a href={telLink()}>{e.telefonAnzeige}</a><br></>}
+      {e.email && <>E-Mail: <a href={`mailto:${e.email}`}>{e.email}</a></>}
+    </p>
+
+    <h2>2. Hosting und Server-Logfiles</h2>
+    <p>
+      Diese Website wird bei Cloudflare, Inc. (101 Townsend St, San Francisco, CA 94107, USA) gehostet
+      (Cloudflare Pages). Beim Aufruf der Seite verarbeitet Cloudflare technisch notwendige Daten, damit die Seite
+      ausgeliefert und vor Angriffen geschützt werden kann. Dazu gehören die IP-Adresse, Datum und Uhrzeit des
+      Abrufs, die aufgerufene Seite, die übertragene Datenmenge sowie Browser- und Betriebssysteminformationen.
+    </p>
+    <p>
+      Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt in einer sicheren und
+      zuverlässigen Bereitstellung der Website. Cloudflare ist unter dem EU-US Data Privacy Framework zertifiziert.
+      Mit Cloudflare besteht ein Vertrag zur Auftragsverarbeitung.
+    </p>
+
+    <h2>3. Cookies und Tracking</h2>
+    <p>
+      Diese Website setzt keine Cookies zu Analyse- oder Werbezwecken und verwendet keine Tracking- oder
+      Statistikdienste.
+    </p>
+
+    <h2>4. Schriftarten</h2>
+    <p>
+      Die auf dieser Seite verwendete Schriftart „Atkinson Hyperlegible Next“ liegt auf unserem eigenen Server.
+      Beim Aufruf der Seite wird keine Verbindung zu Google oder anderen Schriftanbietern aufgebaut.
+    </p>
+
+    <h2>5. Kontaktaufnahme</h2>
+    <p>
+      Wenn Sie uns anrufen, per E-Mail oder über WhatsApp kontaktieren, verarbeiten wir Ihre Angaben (zum
+      Beispiel Name, Telefonnummer, Nachricht und gesendete Fotos), um Ihre Anfrage zu bearbeiten. Rechtsgrundlage
+      ist Art. 6 Abs. 1 lit. b DSGVO, soweit die Anfrage mit einem Vertrag zusammenhängt oder zur Vorbereitung
+      eines Vertrags erfolgt, sonst Art. 6 Abs. 1 lit. f DSGVO. Wir löschen die Daten, sobald sie für den Zweck
+      nicht mehr erforderlich sind und keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
+    </p>
+    <p>
+      Bei Nutzung von WhatsApp gilt zusätzlich die Datenschutzerklärung von WhatsApp (WhatsApp Ireland Limited,
+      Merrion Road, Dublin 4, Irland). Diese Website verbindet sich erst dann mit WhatsApp, wenn Sie den
+      WhatsApp-Link anklicken.
+    </p>
+
+    <h2>6. Externe Links</h2>
+    <p>
+      Diese Website enthält Links zu anderen Anbietern, zum Beispiel zu MyHammer. Beim Anklicken verlassen Sie
+      unsere Seite. Für die Datenverarbeitung dort ist der jeweilige Anbieter verantwortlich.
+    </p>
+
+    <h2>7. Ihre Rechte</h2>
+    <p>
+      Sie haben gegenüber uns das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17),
+      Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch gegen die
+      Verarbeitung auf Grundlage berechtigter Interessen (Art. 21). Eine erteilte Einwilligung können Sie jederzeit
+      mit Wirkung für die Zukunft widerrufen. Wenden Sie sich dazu an die oben genannte Adresse.
+    </p>
+
+    <h2>8. Beschwerderecht</h2>
+    <p>
+      Sie haben das Recht, sich bei einer Datenschutzaufsichtsbehörde zu beschweren. Zuständig für uns ist das
+      Unabhängige Landeszentrum für Datenschutz Schleswig-Holstein, Holstenstraße 98, 24103 Kiel,
+      <a href="https://www.datenschutzzentrum.de" rel="noopener">www.datenschutzzentrum.de</a>.
+    </p>
+
+    <h2>9. Sicherheit</h2>
+    <p>Diese Seite wird verschlüsselt über HTTPS übertragen.</p>
+  </section>
+</Seite>
